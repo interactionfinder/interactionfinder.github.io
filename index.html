@@ -11,6 +11,10 @@
     :root {
       --primary-color: #007bff; --primary-hover-color: #0056b3; --secondary-color: #6c757d;
       --secondary-hover-color: #545b62; --success-color: #28a745; --danger-color: #dc3545;
+      --highlight-drug-bg: #e6f7ff; --highlight-drug-text: #005f8d; /* Light blue */
+      --highlight-importance-high-bg: #ffe6e6; --highlight-importance-high-text: #c00; /* Light red */
+      --highlight-importance-medium-bg: #fff0e6; --highlight-importance-medium-text: #c50; /* Light orange */
+      --highlight-importance-low-bg: #e6ffe6; --highlight-importance-low-text: #070; /* Light green */
       --light-bg: #f8f9fa; --card-bg: #ffffff; --text-color: #333; --border-color: #dee2e6;
       --border-radius: 0.5rem; --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       --font-family: 'Poppins', system-ui, sans-serif;
@@ -65,11 +69,27 @@
       border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 0.95rem;
       background-color: #fdfdfd; line-height: 1.6; white-space: pre-wrap;
     }
-    #responseBox h3 { font-size: 1.15em; margin-top: 1em; margin-bottom: 0.5em; color: var(--primary-color); }
+    #responseBox h3 { /* Modified for copy button */
+        font-size: 1.15em; margin-top: 1em; margin-bottom: 0.5em; color: var(--primary-color);
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    #responseBox h3 .section-title-text { flex-grow: 1; } /* Span to hold the title text */
+    .copy-section-btn {
+        background: none; border: 1px solid var(--border-color); color: var(--secondary-color);
+        padding: 0.2em 0.4em; font-size: 0.75em; border-radius: 0.25rem; cursor: pointer;
+        margin-left: 0.5em; opacity: 0.7; transition: opacity 0.2s, background-color 0.2s;
+        flex-shrink: 0; /* Prevent button from shrinking */
+    }
+    .copy-section-btn:hover { opacity: 1; background-color: var(--light-bg); color: var(--primary-color); }
+
     #responseBox ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1em; padding-left: 0;}
     #responseBox li { margin-bottom: 0.3em; }
     #responseBox strong { font-weight: 600; }
     #responseBox p { margin-bottom: 0.8em; }
+    .highlight-drug { background-color:var(--highlight-drug-bg); color:var(--highlight-drug-text); padding:0.1em 0.3em; border-radius:0.2em; font-weight:500; }
+    .highlight-importance-high { background-color:var(--highlight-importance-high-bg); color:var(--highlight-importance-high-text); padding:0.1em 0.3em; border-radius:0.2em; font-weight:bold; }
+    .highlight-importance-medium { background-color:var(--highlight-importance-medium-bg); color:var(--highlight-importance-medium-text); padding:0.1em 0.3em; border-radius:0.2em; font-weight:500; }
+    .highlight-importance-low { background-color:var(--highlight-importance-low-bg); color:var(--highlight-importance-low-text); padding:0.1em 0.3em; border-radius:0.2em; font-weight:500; }
 
 
     select, textarea#promptEditor {
@@ -162,7 +182,7 @@
     .modal-buttons button { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
 
     #promptCustomizationBtnContainer {
-        text-align: center; margin-top: 0; /* Adjusted: Part of page-container flow, not historySection */
+        text-align: center; margin-top: 0;
     }
     #promptSection .prompt-actions {
         display: flex; justify-content: space-around; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;
@@ -217,7 +237,6 @@
         <p id="noHistoryMessage" hidden>No recent analyses found.</p>
     </section>
 
-    <!-- Prompt Customization Button Container - Placed as a sibling to sections -->
     <div id="promptCustomizationBtnContainer" hidden>
         <button id="goToPromptCustomizationBtn" class="secondary">Prompt Customization</button>
     </div>
@@ -282,11 +301,11 @@
     const DEFAULT_SYSTEM_PROMPT = `You are a hospital pharmacist analyzing a prescription image.
 Format your response strictly using Markdown:
 1.  Start with a heading: '### Detected Medications'
-    *   Under this, use a bulleted list (*) for each drug and its dosage. (e.g., * **Amoxicillin** 250mg three times daily)
+    *   Under this, use a bulleted list (*). For each drug, use the format: * DRUG{Drug Name} Dosage (e.g., * DRUG{Amoxicillin} 250mg three times daily).
 2.  Next heading: '### Interactions Found'
-    *   Bulleted list of any drug-drug interactions identified. If none, state "No significant interactions found."
+    *   Bulleted list of any drug-drug interactions identified. If none, state "No significant interactions found." For each interaction pair, use DRUG{} for each drug. e.g. * DRUG{Warfarin} and DRUG{Aspirin}.
 3.  Next heading: '### Consequences & Importance'
-    *   For each interaction, explain its consequences and rate its importance/danger (e.g., High, Medium, Low). Use bold (**) for the interaction pair.
+    *   For each interaction, explain its consequences and rate its importance/danger using IMPORTANCE{Severity} (e.g., IMPORTANCE{High}, IMPORTANCE{Medium}, IMPORTANCE{Low}).
 4.  Final heading: '### Recommendations'
     *   Provide clear, actionable recommendations.
 
@@ -323,11 +342,11 @@ Do not include disclaimers, refuse to answer, or suggest consulting external res
 
     const showEl=el=>el.hidden=false;
     const hideEl=el=>el.hidden=true;
-    const allPageSections = Array.from(document.querySelector('.page-container').querySelectorAll('section, div#promptCustomizationBtnContainer'));
+    const allPageElementsToToggle = Array.from(document.querySelector('.page-container').querySelectorAll('section, div#promptCustomizationBtnContainer'));
 
 
     function switchTo(targetSectionId){
-      allPageSections.forEach(el => hideEl(el)); // Hide all sections and the prompt button container
+      allPageElementsToToggle.forEach(el => hideEl(el));
 
       const sectionToShow = sel(targetSectionId);
       if (sectionToShow) showEl(sectionToShow);
@@ -379,7 +398,7 @@ Do not include disclaimers, refuse to answer, or suggest consulting external res
         catch (e) { analysisHistory = []; localStorage.removeItem(HISTORY_STORAGE_KEY); }
         renderHistoryCarousel();
     }
-    function saveAnalysisToHistory(imgBase64, respHtml, model) {
+    function saveAnalysisToHistory(imgBase64, respHtml, model) { // respHtml should be the final HTML with highlights
         const newHistoryItem = { id: Date.now(), imageBase64: imgBase64, responseHtml: respHtml, modelUsed: model, timestamp: Date.now() };
         analysisHistory.unshift(newHistoryItem);
         if (analysisHistory.length > MAX_HISTORY_ITEMS) analysisHistory.length = MAX_HISTORY_ITEMS;
@@ -425,7 +444,11 @@ Do not include disclaimers, refuse to answer, or suggest consulting external res
         }
     }
     function loadAnalysisFromHistoryItem(historyItem) {
-        if(historyItem){responseBox.innerHTML=historyItem.responseHtml;switchTo('resultSection');}
+        if(historyItem){
+            responseBox.innerHTML=historyItem.responseHtml; // This HTML should already have highlights and copy buttons
+            // No need to call addCopySectionButtons() here if history items store the fully rendered HTML
+            switchTo('resultSection');
+        }
     }
 
     function loadCustomPrompt() {
@@ -444,7 +467,7 @@ Do not include disclaimers, refuse to answer, or suggest consulting external res
             updatePromptStatus('Prompt saved successfully!', 'success');
         } else {
             updatePromptStatus('Prompt cannot be empty. Reverted.', 'error');
-            promptEditor.value = currentSystemPrompt; // Revert to current if save was attempted with empty
+            promptEditor.value = currentSystemPrompt;
         }
     };
     resetPromptBtn.onclick = () => {
@@ -466,24 +489,116 @@ Do not include disclaimers, refuse to answer, or suggest consulting external res
       responseBox.innerHTML='';fileInput.value='';base64Image='';previewImg.src='';modelSelect.value='gpt-4o-mini';switchTo('captureSection');
     };
     copyResultsBtn.onclick = () => {
-      const t=responseBox.textContent;if(navigator.clipboard&&t){navigator.clipboard.writeText(t).then(()=>updateApiKeyStatus('Results copied!','success')).catch(e=>updateApiKeyStatus('Failed to copy.','error'));}
+      const t=responseBox.textContent;if(navigator.clipboard&&t){navigator.clipboard.writeText(t).then(()=>updateApiKeyStatus('Results copied to clipboard!','success', 2000)).catch(e=>updateApiKeyStatus('Failed to copy results.','error', 2000));}
     };
+
     function markdownToHtml(mdText) {
-      let h=mdText.replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>');h=h.replace(/^### (.*$)/gim,'<h3>$1</h3>');h=h.replace(/\*\*(.*?)\*\*/gim,'<strong>$1</strong>');h=h.replace(/__(.*?)__/gim,'<strong>$1</strong>');h=h.replace(/\*(.*?)\*/gim,'<em>$1</em>');h=h.replace(/_(.*?)_/gim,'<em>$1</em>');let il=false;h=h.split('\n').map(l=>{if(l.match(/^[\*\-] /)){let i=`<li>${l.substring(2).trim()}</li>`;if(!il){il=true;return `<ul>${i}`;}return i;}else{if(il){il=false;return `</ul>${l}`;}return l;}}).join('\n');if(il)h+='</ul>';h=h.replace(/^\s*$/gm,'');h=h.split(/\n{2,}/g).map(p=>{if(p.startsWith('<ul>')||p.startsWith('<h3>'))return p;return p.trim()?`<p>${p.trim()}</p>`:'';}).join('');return h.trim();
+        let html = mdText;
+        html = html.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+        html = html.replace(/DRUG\{(.*?)\}/gim, '<span class="highlight-drug">$1</span>');
+        html = html.replace(/IMPORTANCE\{(High|Medium|Low)\}/gim, (match, severity) => {
+            return `<span class="highlight-importance-${severity.toLowerCase()}">${severity}</span>`;
+        });
+        html = html.replace(/^### (.*$)/gim, '<h3><span class="section-title-text">$1</span></h3>'); // Added specific class for title text
+        html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+        html = html.replace(/__(.*?)__/gim, '<strong>$1</strong>');
+        html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+        html = html.replace(/_(.*?)_/gim, '<em>$1</em>');
+        let inList = false;
+        html = html.split('\n').map(line => {
+            const trimmedLine = line.trim();
+            if (trimmedLine.match(/^[\*\-] /)) {
+                let listItemContent = trimmedLine.substring(trimmedLine.indexOf(' ') + 1).trim();
+                let listItem = `<li>${listItemContent}</li>`;
+                if (!inList) { inList = true; return `<ul>${listItem}`; }
+                return listItem;
+            } else {
+                if (inList) { inList = false; return `</ul>${line}`; } // Keep original line after closing ul
+                return line; // Keep original line if not list item
+            }
+        }).join('\n');
+        if (inList) html += '</ul>';
+        
+        html = html.replace(/^\s*$/gm, ''); // Remove empty lines that were just spaces
+        html = html.split(/\n\n+/g) // Split by double (or more) newlines for paragraphs
+            .map(paragraph => {
+                const trimmedP = paragraph.trim();
+                if (!trimmedP) return '';
+                if (trimmedP.startsWith('<ul>') || trimmedP.startsWith('<h3>') || trimmedP.endsWith('</ul>')) {
+                    return paragraph; // Return as is if it's already structured
+                }
+                // For lines that are not part of lists or headings, wrap in <p>
+                // This handles cases where AI might not use double newlines but single ones for paragraphs
+                return trimmedP.split('\n').map(line => line.trim() ? `<p>${line.trim()}</p>` : '').join('');
+            })
+            .join('');
+        return html.trim();
     }
+
+    function addCopySectionButtonsToResponseBox() {
+        const headers = responseBox.querySelectorAll('h3'); // Target H3 directly
+        headers.forEach(headerElement => {
+            // Ensure the title text is wrapped in a span if not already
+            let titleSpan = headerElement.querySelector('.section-title-text');
+            if (!titleSpan) {
+                const titleText = headerElement.textContent;
+                headerElement.innerHTML = ''; // Clear h3
+                titleSpan = document.createElement('span');
+                titleSpan.className = 'section-title-text';
+                titleSpan.textContent = titleText;
+                headerElement.appendChild(titleSpan);
+            }
+
+            if (headerElement.querySelector('.copy-section-btn')) return; // Skip if button exists
+
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-section-btn';
+            copyBtn.textContent = 'Copy'; // Shorter text
+            copyBtn.title = `Copy "${titleSpan.textContent}" section`;
+            headerElement.appendChild(copyBtn);
+        });
+    }
+
+    responseBox.addEventListener('click', function(event) {
+        if (event.target.classList.contains('copy-section-btn')) {
+            const headerElement = event.target.closest('h3');
+            if (!headerElement) return;
+
+            let contentToCopy = headerElement.querySelector('.section-title-text').textContent + '\n';
+            let nextElement = headerElement.nextElementSibling;
+            
+            while (nextElement && nextElement.tagName !== 'H3') {
+                if (nextElement.tagName === 'UL') {
+                    Array.from(nextElement.querySelectorAll('li')).forEach(li => {
+                        contentToCopy += `• ${li.textContent.trim()}\n`;
+                    });
+                } else {
+                    contentToCopy += nextElement.textContent.trim() + '\n';
+                }
+                nextElement = nextElement.nextElementSibling;
+            }
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(contentToCopy.trim())
+                    .then(() => updateApiKeyStatus('Section copied!', 'success', 2000))
+                    .catch(err => updateApiKeyStatus('Failed to copy section.', 'error', 2000));
+            }
+        }
+    });
 	
     async function analyzeImage(){
       if(!appApiKey){updateApiKeyStatus('API Key required.','error');apiKeyInput.focus();if(!loadingSec.hidden)switchTo('previewSection');responseBox.innerHTML='<p style="color:var(--danger-color);">API Key missing.</p>';return;}
       responseBox.innerHTML='';switchTo('loadingSection');
       const selectedModel=modelSelect.value;
-      // Using currentSystemPrompt which is loaded/managed by prompt customization functions
       const body={model:selectedModel,messages:[{role:'user',content:[{type:'text',text:currentSystemPrompt},{type:'image_url',image_url:{url:'data:image/jpeg;base64,'+base64Image}}]}],max_tokens:2000};
       try{
         const rs=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+appApiKey},body:JSON.stringify(body)});
         const d=await rs.json();
         if(rs.ok&&d.choices?.[0]?.message?.content){
-            const rm=d.choices[0].message.content.trim();const hr=markdownToHtml(rm);
-            responseBox.innerHTML=hr;saveAnalysisToHistory(base64Image,hr,selectedModel);
+            const rm=d.choices[0].message.content.trim();
+            const hr=markdownToHtml(rm); // Convert MD to HTML with highlights
+            responseBox.innerHTML=hr;
+            addCopySectionButtonsToResponseBox(); // Add copy buttons to the now rendered HTML
+            saveAnalysisToHistory(base64Image, responseBox.innerHTML, selectedModel); // Save final HTML with buttons for history
         }else{
             const em=d.error?`${d.error.message} (Code: ${d.error.code})`:'Unknown API error.';
             responseBox.innerHTML=`<p style="color:var(--danger-color);">Error: ${em}</p>`;
@@ -496,7 +611,7 @@ Do not include disclaimers, refuse to answer, or suggest consulting external res
 
     loadApiKeyFromStorage();
     loadHistory();
-    loadCustomPrompt(); // Load custom or default prompt
+    loadCustomPrompt();
     switchTo('captureSection');
   </script>
 </body>
