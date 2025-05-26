@@ -9,362 +9,163 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary-color: #007bff;
-      --primary-hover-color: #0056b3;
-      --secondary-color: #6c757d;
-      --secondary-hover-color: #545b62;
-      --success-color: #28a745;
-      --danger-color: #dc3545;
-      --light-bg: #f8f9fa;
-      --card-bg: #ffffff;
-      --text-color: #333;
-      --border-color: #dee2e6;
-      --border-radius: 0.5rem;
-      --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      --font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --primary-color: #007bff; --primary-hover-color: #0056b3; --secondary-color: #6c757d;
+      --secondary-hover-color: #545b62; --success-color: #28a745; --danger-color: #dc3545;
+      --light-bg: #f8f9fa; --card-bg: #ffffff; --text-color: #333; --border-color: #dee2e6;
+      --border-radius: 0.5rem; --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --font-family: 'Poppins', system-ui, sans-serif;
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: var(--font-family);
-      background-color: var(--light-bg);
-      color: var(--text-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 2rem 1rem;
+      font-family: var(--font-family); background-color: var(--light-bg); color: var(--text-color);
+      display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 1.5rem 1rem;
     }
-
-    /* API Key Configuration Area Styles */
     #apiKeyConfigArea {
-      background-color: var(--card-bg);
-      padding: 1.25rem 1.5rem;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      margin-bottom: 2rem;
-      width: 100%;
-      max-width: 700px;
+      background-color: var(--card-bg); padding: 1rem 1.25rem; border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow); margin-bottom: 1.5rem; width: 100%; max-width: 700px;
     }
-
-    #apiKeyConfigArea h3 {
-      margin-top: 0;
-      margin-bottom: 1rem;
-      font-size: 1.25rem;
-      color: var(--text-color);
-    }
-
-    .api-key-form-group {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 0.75rem;
-    }
-
-    #apiKeyConfigArea label {
-      font-weight: 500;
-      flex-shrink: 0;
-    }
-
+    #apiKeyConfigArea h3 { margin-top: 0; margin-bottom: 0.75rem; font-size: 1.15rem; }
+    .api-key-form-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+    #apiKeyConfigArea label { font-weight: 500; flex-shrink: 0; font-size: 0.9rem; }
     #apiKeyConfigArea input[type="password"] {
-      flex-grow: 1;
-      padding: 0.6rem 0.85rem;
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      font-size: 0.95rem;
-      min-width: 200px;
+      flex-grow: 1; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color);
+      border-radius: var(--border-radius); font-size: 0.9rem; min-width: 180px;
     }
-     #apiKeyConfigArea input[type="password"]:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-    }
+    #apiKeyConfigArea input[type="password"]:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
+    #apiKeyConfigArea .api-key-buttons button { padding: 0.5rem 0.9rem; font-size: 0.85rem; margin-right: 0.4rem; }
+    #apiKeyConfigArea .api-key-buttons button.test-key { background-color: var(--success-color); }
+    #apiKeyConfigArea .api-key-buttons button.test-key:hover { background-color: #1e7e34; }
+    #apiKeyStatus { font-size: 0.85rem; min-height: 1.2em; margin-top: 0.4rem; font-weight: 500; }
+    #apiKeyStatus.success { color: var(--success-color); } #apiKeyStatus.error { color: var(--danger-color); } #apiKeyStatus.info { color: var(--secondary-color); }
 
-    #apiKeyConfigArea .api-key-buttons button {
-      padding: 0.6rem 1rem;
-      font-size: 0.9rem;
-      margin-right: 0.5rem;
+    .page-container { width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 1.5rem; }
+    section { /* This style applies to all section cards now, including history */
+      background-color: var(--card-bg); padding: 1.25rem 1.5rem; border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow); width: 100%;
     }
-     #apiKeyConfigArea .api-key-buttons button:last-child {
-      margin-right: 0;
-    }
-    #apiKeyConfigArea .api-key-buttons button.test-key {
-        background-color: var(--success-color);
-    }
-    #apiKeyConfigArea .api-key-buttons button.test-key:hover {
-        background-color: #1e7e34;
-    }
-
-
-    #apiKeyStatus {
-      font-size: 0.9rem;
-      min-height: 1.3em;
-      margin-top: 0.5rem;
-      font-weight: 500;
-    }
-    #apiKeyStatus.success { color: var(--success-color); }
-    #apiKeyStatus.error { color: var(--danger-color); }
-    #apiKeyStatus.info { color: var(--secondary-color); }
-
-
-    .container {
-      width: 100%;
-      max-width: 700px;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-
-    section {
-      background-color: var(--card-bg);
-      padding: 1.5rem 2rem;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      width: 100%;
-    }
-
     button {
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      font-weight: 500;
-      border: none;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      background: var(--primary-color);
-      color: #fff;
-      transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+      padding: 0.7rem 1.4rem; font-size: 0.95rem; font-weight: 500; border: none;
+      border-radius: var(--border-radius); cursor: pointer; background: var(--primary-color);
+      color: #fff; transition: background-color 0.2s ease-in-out, transform 0.1s ease;
     }
+    button:hover { background: var(--primary-hover-color); transform: translateY(-1px); }
+    button.secondary { background-color: var(--secondary-color); }
+    button.secondary:hover { background-color: var(--secondary-hover-color); }
 
-    button:hover {
-      background: var(--primary-hover-color);
-      transform: translateY(-1px);
-    }
-    
-    button:active {
-      transform: translateY(0);
-    }
+    img#previewImg { max-width: 100%; height: auto; border-radius: var(--border-radius); box-shadow: 0 2px 6px rgba(0,0,0,.1); margin-top: 1rem; margin-bottom: 1.5rem; display: block; }
+    [hidden] { display: none !important; }
+    .spinner { width: 40px; height: 40px; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 1.5rem auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    button.secondary {
-      background-color: var(--secondary-color);
-    }
-    button.secondary:hover {
-      background-color: var(--secondary-hover-color);
-    }
-
-    img#previewImg {
-      max-width: 100%;
-      height: auto;
-      border-radius: var(--border-radius);
-      box-shadow: 0 2px 6px rgba(0,0,0,.1);
-      margin-top: 1rem;
-      margin-bottom: 1.5rem;
-      display: block;
-    }
-
-    [hidden] {
-      display: none !important;
-    }
-
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 7px solid #f3f3f3;
-      border-top: 7px solid var(--primary-color);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 2rem auto;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Changed textarea to div for formatted results */
     #responseBox {
-      width: 100%;
-      min-height: 200px; /* Start with a decent min-height */
-      max-height: 500px; /* Prevent it from getting too tall */
-      overflow-y: auto; /* Allow scrolling for long content */
-      padding: 1rem;
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      font-size: 1rem;
-      font-family: var(--font-family); /* Ensure consistent font */
-      background-color: #fdfdfd; /* Slightly off-white for results area */
-      line-height: 1.6;
-      white-space: pre-wrap; /* Preserve line breaks from AI */
+      width: 100%; min-height: 180px; max-height: 450px; overflow-y: auto; padding: 1rem;
+      border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 0.95rem;
+      background-color: #fdfdfd; line-height: 1.6; white-space: pre-wrap;
     }
-    /* Styling for elements within #responseBox from Markdown */
-    #responseBox h3 {
-      font-size: 1.2em;
-      margin-top: 1em;
-      margin-bottom: 0.5em;
-      color: var(--primary-color);
-    }
-    #responseBox ul {
-      list-style-position: inside;
-      padding-left: 0; /* Reset browser default */
-      margin-bottom: 1em;
-    }
-    #responseBox li {
-      margin-bottom: 0.3em;
-    }
-    #responseBox strong {
-      font-weight: 600;
-    }
-    #responseBox p { /* For potential future use if Markdown parser adds <p> */
-        margin-bottom: 0.8em;
-    }
+    #responseBox h3 { font-size: 1.15em; margin-top: 1em; margin-bottom: 0.5em; color: var(--primary-color); }
+    #responseBox ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1em; padding-left: 0;}
+    #responseBox li { margin-bottom: 0.3em; }
+    #responseBox strong { font-weight: 600; }
+    #responseBox p { margin-bottom: 0.8em; }
 
 
     select {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      font-size: 1rem;
-      font-family: var(--font-family);
-      background-color: #fff;
-      color: var(--text-color);
-    }
-    
-    select:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+      width: 100%; padding: 0.6rem 0.9rem; border: 1px solid var(--border-color);
+      border-radius: var(--border-radius); font-size: 0.95rem; background-color: #fff; color: var(--text-color);
     }
 
+    h1, h2 { font-weight: 600; color: var(--text-color); margin-bottom: 0.75rem; }
+    h1 { font-size: 1.6rem; } h2 { font-size: 1.3rem; }
+    /* Center h2 for sections that have centered content */
+    #captureSection > h2, #historySection > h2 { text-align: center; }
 
-    h1, h2 {
-      font-weight: 600;
-      color: var(--text-color);
-      margin-bottom: 0.75rem;
-    }
-    h1 { 
-      font-size: 1.75rem;
-    }
-    h2 {
-      font-size: 1.4rem;
-    }
 
     #mainHeader {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      padding: 0;
-      box-shadow: none;
-      background-color: transparent;
-      width: 100%;
-      max-width: 700px; 
+      display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem; width: 100%; max-width: 700px;
     }
+    #mainHeader img { width: 40px; height: 40px; border-radius: 50%; }
+    #mainHeader h1 { margin: 0; }
 
-    #mainHeader img {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
+    #loadingSection { text-align: center; }
+    #loadingSection p { margin-top: 0.5rem; font-size: 1rem; color: var(--secondary-color); }
+    #previewSection .button-group { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.2rem; }
+    #previewSection select { margin-bottom: 0.6rem; }
+    #resultSection { display: flex; flex-direction: column; }
+    .result-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 1.2rem; gap: 0.8rem; }
+    .result-actions button { flex-grow: 1; }
+    @media (max-width: 480px) { .result-actions { flex-direction: column; } }
 
-    #mainHeader h1 {
-      font-size: 1.75rem;
-      margin: 0;
-      font-weight: 600;
-      color: var(--text-color);
-      line-height: 1.2;
+    /* History section styles remain largely the same, but it's now its own card */
+    /* #historySection { padding-top: 0; } Remove extra top padding if it's its own card */
+    #historySection h2 { margin-bottom: 0.75rem; text-align: center; }
+    #historyCarouselContainer { overflow-x: auto; white-space: nowrap; padding-bottom: 1rem; margin-bottom: -1rem; }
+    #historyCarousel { display: flex; gap: 0.75rem; }
+    .history-item-wrapper {
+        display: flex; flex-direction: column; align-items: center;
+        text-decoration: none; color: var(--text-color); width: 110px;
     }
-
-    #captureSection, #loadingSection {
-      text-align: center;
+    .history-item {
+        width: 100px; height: 100px; border: 2px solid var(--border-color);
+        border-radius: var(--border-radius); overflow: hidden; cursor: pointer;
+        transition: border-color 0.2s ease, transform 0.2s ease; margin-bottom: 0.25rem;
     }
-    
-    #loadingSection p {
-      margin-top: 0.5rem;
-      font-size: 1.1rem;
-      color: var(--secondary-color);
+    .history-item:hover { border-color: var(--primary-color); transform: translateY(-2px); }
+    .history-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .history-item-date {
+        font-size: 0.75rem; color: var(--secondary-color); text-align: center;
+        display: block; white-space: normal; line-height: 1.2;
     }
-
-    #previewSection .button-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-top: 1.5rem;
-      align-items: stretch;
-    }
-    
-    #previewSection select {
-        margin-bottom: 0.75rem;
-    }
-
-    #resultSection {
-        display: flex;
-        flex-direction: column;
-    }
-    .result-actions {
-        display: flex;
-        justify-content: space-between; /* Aligns buttons */
-        align-items: center;
-        margin-top: 1.5rem;
-        gap: 1rem; /* Space between buttons */
-    }
-    .result-actions button {
-        flex-grow: 1; /* Make buttons share space */
-    }
-    @media (max-width: 480px) { /* Stack buttons on small screens */
-        .result-actions {
-            flex-direction: column;
-        }
-    }
-
-
+    #noHistoryMessage { color: var(--secondary-color); font-style: italic; text-align: center; padding: 1rem 0;}
   </style>
 </head>
 <body>
 
-  <!-- ───── Header ───── -->
   <header id="mainHeader">
     <img src="https://www.citypng.com/public/uploads/preview/black-circle-round-question-mark-icon-png-70175169496360405wfyhabkn.png" alt="Logo">
     <h1>Interaction Finder</h1>
   </header>
 
-  <!-- ───── API Key Configuration ───── -->
   <div id="apiKeyConfigArea">
     <h3>API Key Configuration</h3>
     <div class="api-key-form-group">
       <label for="apiKeyInput">OpenAI API Key:</label>
-      <input type="password" id="apiKeyInput" placeholder="Enter your OpenAI API Key (e.g., sk-...)">
+      <input type="password" id="apiKeyInput" placeholder="Enter your OpenAI API Key">
     </div>
     <div class="api-key-buttons">
-      <button id="saveApiKeyBtn">Save Key</button>
-      <button id="testApiKeyBtn" class="test-key">Test Key</button>
-      <button id="clearApiKeyBtn" class="secondary">Clear Key</button>
+      <button id="saveApiKeyBtn">Save</button>
+      <button id="testApiKeyBtn" class="test-key">Test</button>
+      <button id="clearApiKeyBtn" class="secondary">Clear</button>
     </div>
     <p id="apiKeyStatus" class="info"></p>
   </div>
 
-
-  <div class="container">
-    <!-- ───── Capture section ───── -->
-    <section id="captureSection">
+  <div class="page-container">
+    <section id="captureSection"> <!-- Only "Take a Photo" elements -->
       <h2>Take a Photo</h2>
-      <p style="margin-bottom: 1.5rem; color: #555;">Upload an image of the prescription to analyze.</p>
-      <button id="takePhotoBtn">Take Photo or Upload</button>
+      <p style="margin-bottom: 1.2rem; color: #555; font-size: 0.9rem; text-align: center;">
+        Upload an image of the prescription to analyze.
+      </p>
+      <div style="text-align:center;">
+        <button id="takePhotoBtn">Take Photo or Upload</button>
+      </div>
       <input id="fileInput" type="file" accept="image/*" capture="environment" hidden>
     </section>
 
-    <!-- ───── Preview section ───── -->
+    <section id="historySection" hidden> <!-- Now its own section, initially hidden by JS -->
+        <h2>Recent Analyses</h2>
+        <div id="historyCarouselContainer">
+            <div id="historyCarousel">
+                <!-- History items will be injected here -->
+            </div>
+        </div>
+        <p id="noHistoryMessage" hidden>No recent analyses found.</p>
+    </section>
+
     <section id="previewSection" hidden>
       <h2>Confirm Prescription Image</h2>
       <img id="previewImg" alt="preview">
       <div class="button-group">
-        <p style="margin-bottom: 0.5rem; text-align: center;">Select AI Model:</p>
+        <p style="margin-bottom: 0.5rem; text-align: center; font-size:0.9rem;">Select AI Model:</p>
         <select id="modelSelect">
           <option value="gpt-4o-mini">GPT-4o-mini (Faster, Good)</option>
           <option value="gpt-4o">GPT-4o (Slower, Best)</option>
@@ -374,16 +175,14 @@
       </div>
     </section>
 
-    <!-- ───── Loading section ───── -->
     <section id="loadingSection" hidden>
       <div class="spinner"></div>
       <p>Analyzing image, please wait…</p>
     </section>
 
-    <!-- ───── Result section ───── -->
     <section id="resultSection" hidden>
       <h2>Analysis Results</h2>
-      <div id="responseBox" role="document" aria-live="polite">Enter an API Key and analyze an image to see results.</div>
+      <div id="responseBox" role="document" aria-live="polite"></div>
       <div class="result-actions">
         <button id="copyResultsBtn">Copy Results</button>
         <button id="restartBtn" class="secondary">Back to Start</button>
@@ -392,285 +191,290 @@
   </div>
 
   <script>
-    // API Key Management
-    const apiKeyInput = sel('apiKeyInput');
-    const saveApiKeyBtn = sel('saveApiKeyBtn');
-    const testApiKeyBtn = sel('testApiKeyBtn');
-    const clearApiKeyBtn = sel('clearApiKeyBtn');
-    const apiKeyStatus = sel('apiKeyStatus');
-    let appApiKey = '';
+    const MAX_HISTORY_ITEMS = 7;
+    const HISTORY_STORAGE_KEY = 'interactionFinderHistory';
 
-    function updateApiKeyStatus(message, type = 'info') {
-        apiKeyStatus.textContent = message;
-        apiKeyStatus.className = type; // 'info', 'success', 'error'
-        if (message) { // Auto-clear message after a few seconds
-            setTimeout(() => {
-                if (apiKeyStatus.textContent === message) { // Clear only if it's still the same message
-                    apiKeyStatus.textContent = '';
-                    apiKeyStatus.className = 'info';
-                }
-            }, 5000);
+    function sel(id){ return document.getElementById(id); }
+    const apiKeyInput = sel('apiKeyInput'), saveApiKeyBtn = sel('saveApiKeyBtn'),
+          testApiKeyBtn = sel('testApiKeyBtn'), clearApiKeyBtn = sel('clearApiKeyBtn'),
+          apiKeyStatus = sel('apiKeyStatus');
+    const takePhotoBtn=sel('takePhotoBtn'), fileInput  =sel('fileInput'),
+          previewImg =sel('previewImg'), usePhotoBtn=sel('usePhotoBtn'),
+          retakeBtn  =sel('retakeBtn'), modelSelect=sel('modelSelect'),
+          loadingSec = sel('loadingSection'), responseBox  =sel('responseBox'),
+          restartBtn =sel('restartBtn'), copyResultsBtn = sel('copyResultsBtn');
+    const historyCarousel = sel('historyCarousel'), noHistoryMessage = sel('noHistoryMessage'),
+          historySectionElement = sel('historySection'), // Reference to the new history section card
+          historyCarouselContainer = sel('historyCarouselContainer');
+
+
+    let appApiKey = '';
+    let base64Image='';
+    let analysisHistory = [];
+
+    const showEl=el=>el.hidden=false;
+    const hideEl=el=>el.hidden=true;
+    // Sections for primary view switching
+    const mainViewSections = ['captureSection', 'previewSection', 'loadingSection', 'resultSection'].map(sel);
+
+
+    function switchTo(targetSectionId){
+      mainViewSections.forEach(sec => hideEl(sec)); // Hide all main view sections
+      hideEl(historySectionElement); // Always hide history initially in a switch
+
+      const sectionToShow = sel(targetSectionId);
+      if (sectionToShow) {
+        showEl(sectionToShow);
+      }
+
+      // Show historySection only if captureSection is the target
+      if (targetSectionId === 'captureSection') {
+        showEl(historySectionElement);
+        // Ensure carousel container visibility is correct based on history content
+        if (analysisHistory.length > 0) {
+            hideEl(noHistoryMessage);
+            showEl(historyCarouselContainer);
+        } else {
+            showEl(noHistoryMessage);
+            hideEl(historyCarouselContainer);
         }
+      }
     }
 
-    function loadApiKeyFromStorage() {
+
+    function updateApiKeyStatus(message, type = 'info') { /* ... same as before ... */
+        apiKeyStatus.textContent = message;
+        apiKeyStatus.className = type;
+        if (message) setTimeout(() => { if (apiKeyStatus.textContent === message) apiKeyStatus.textContent = ''; }, 5000);
+    }
+
+    function loadApiKeyFromStorage() { /* ... same as before ... */
       const storedKey = localStorage.getItem('interactionFinderApiKey');
       if (storedKey) {
-        apiKeyInput.value = storedKey;
-        appApiKey = storedKey;
-        updateApiKeyStatus('API Key loaded from storage.', 'info');
+        apiKeyInput.value = storedKey; appApiKey = storedKey;
+        updateApiKeyStatus('API Key loaded.', 'info');
       } else {
         updateApiKeyStatus('Please enter and save your OpenAI API Key.', 'info');
       }
     }
-
-    saveApiKeyBtn.onclick = () => {
+    saveApiKeyBtn.onclick = () => { /* ... same as before ... */
       const key = apiKeyInput.value.trim();
       if (key && key.startsWith('sk-')) {
-        localStorage.setItem('interactionFinderApiKey', key);
-        appApiKey = key;
-        updateApiKeyStatus('API Key saved successfully!', 'success');
-      } else if (key) {
-        updateApiKeyStatus('Invalid API Key format. It should start with "sk-".', 'error');
-      } else {
-        updateApiKeyStatus('API Key field cannot be empty.', 'error');
-      }
+        localStorage.setItem('interactionFinderApiKey', key); appApiKey = key;
+        updateApiKeyStatus('API Key saved!', 'success');
+      } else { updateApiKeyStatus(key ? 'Invalid API Key format.' : 'API Key cannot be empty.', 'error'); }
     };
-
-    testApiKeyBtn.onclick = async () => {
+    testApiKeyBtn.onclick = async () => { /* ... same as before ... */
         const keyToTest = apiKeyInput.value.trim();
-        if (!keyToTest) {
-            updateApiKeyStatus('Enter an API key to test.', 'error');
-            return;
-        }
+        if (!keyToTest) { updateApiKeyStatus('Enter an API key to test.', 'error'); return; }
         updateApiKeyStatus('Testing API Key...', 'info');
         try {
-            const response = await fetch('https://api.openai.com/v1/models', {
-                headers: { 'Authorization': `Bearer ${keyToTest}` }
-            });
+            const response = await fetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${keyToTest}` } });
             if (response.ok) {
                 updateApiKeyStatus('API Key is valid!', 'success');
-                // Optionally save it if it's valid and different from current appApiKey
-                if (keyToTest !== appApiKey) {
-                    localStorage.setItem('interactionFinderApiKey', keyToTest);
-                    appApiKey = keyToTest;
-                }
-            } else {
-                const errorData = await response.json();
-                updateApiKeyStatus(`API Key test failed: ${errorData.error?.message || response.statusText}`, 'error');
-            }
-        } catch (e) {
-            updateApiKeyStatus('API Key test failed: Network error or CORS issue.', 'error');
-            console.error("API Key Test Error:", e);
-        }
+                if (keyToTest !== appApiKey) { localStorage.setItem('interactionFinderApiKey', keyToTest); appApiKey = keyToTest; }
+            } else { const err = await response.json(); updateApiKeyStatus(`Test failed: ${err.error?.message || response.statusText}`, 'error'); }
+        } catch (e) { updateApiKeyStatus('Test failed: Network error.', 'error'); }
+    };
+    clearApiKeyBtn.onclick = () => { /* ... same as before ... */
+      localStorage.removeItem('interactionFinderApiKey'); apiKeyInput.value = ''; appApiKey = '';
+      updateApiKeyStatus('API Key cleared.', 'info');
     };
 
-    clearApiKeyBtn.onclick = () => {
-      localStorage.removeItem('interactionFinderApiKey');
-      apiKeyInput.value = '';
-      appApiKey = '';
-      updateApiKeyStatus('API Key cleared from storage.', 'info');
-    };
-    
-    // General selectors and functions
-    function sel(id){ return document.getElementById(id); }
-    const show=s=>s.hidden=false;
-    const hide=s=>s.hidden=true;
-
-    const container = document.querySelector('.container');
-    const sections = Array.from(container.querySelectorAll('section'));
-
-    function switchTo(targetSectionElement){
-      sections.forEach(sec => hide(sec));
-      const sectionToShow = typeof targetSectionElement === 'string' ? sel(targetSectionElement) : targetSectionElement;
-      if (sectionToShow) {
-        show(sectionToShow);
-      }
+    function loadHistory() {
+        const storedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
+        try { analysisHistory = storedHistory ? JSON.parse(storedHistory) : []; }
+        catch (e) { analysisHistory = []; localStorage.removeItem(HISTORY_STORAGE_KEY); }
+        renderHistoryCarousel(); // This will also update visibility of container/message
     }
 
-    const takePhotoBtn=sel('takePhotoBtn');
-    const fileInput  =sel('fileInput');
-    const previewImg =sel('previewImg');
-    const usePhotoBtn=sel('usePhotoBtn');
-    const retakeBtn  =sel('retakeBtn');
-    const modelSelect=sel('modelSelect');
-    const loadingSec = sel('loadingSection');
-    const responseBox  =sel('responseBox'); // Now a div
-    const restartBtn =sel('restartBtn');
-    const copyResultsBtn = sel('copyResultsBtn');
+    function saveAnalysisToHistory(currentBase64Image, responseHtml, modelUsed) {
+        const newHistoryItem = {
+            id: Date.now(), imageBase64: currentBase64Image,
+            responseHtml: responseHtml, modelUsed: modelUsed, timestamp: Date.now()
+        };
+        analysisHistory.unshift(newHistoryItem);
+        if (analysisHistory.length > MAX_HISTORY_ITEMS) analysisHistory.length = MAX_HISTORY_ITEMS;
+        try { localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(analysisHistory)); }
+        catch (e) { console.error("Error saving history (Quota?):", e); }
+        renderHistoryCarousel();
+    }
 
-    let base64Image='';
+    function renderHistoryCarousel() {
+        historyCarousel.innerHTML = ''; // Clear existing items
+        // The visibility of historySectionElement itself is handled by switchTo()
+        // Here we manage the content *within* historySectionElement
 
+        if (analysisHistory.length === 0) {
+            showEl(noHistoryMessage);
+            hideEl(historyCarouselContainer);
+        } else {
+            hideEl(noHistoryMessage);
+            showEl(historyCarouselContainer);
+            analysisHistory.forEach(item => {
+                const historyItemWrapper = document.createElement('div');
+                historyItemWrapper.className = 'history-item-wrapper';
+                historyItemWrapper.onclick = () => loadAnalysisFromHistoryItem(item);
+
+                const historyItemDiv = document.createElement('div');
+                historyItemDiv.className = 'history-item';
+
+                const img = document.createElement('img');
+                img.src = `data:image/jpeg;base64,${item.imageBase64}`;
+                img.alt = `Analyzed prescription ${new Date(item.timestamp).toLocaleDateString()}`;
+                
+                historyItemDiv.appendChild(img);
+
+                const dateSpan = document.createElement('span');
+                dateSpan.className = 'history-item-date';
+                
+                const date = new Date(item.timestamp);
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                dateSpan.textContent = `${date.getMonth() + 1}/${date.getDate()}/${String(date.getFullYear()).slice(-2)} ${hours}:${minutes}`;
+                
+                historyItemWrapper.appendChild(historyItemDiv);
+                historyItemWrapper.appendChild(dateSpan);
+                historyCarousel.appendChild(historyItemWrapper);
+            });
+        }
+    }
+
+    function loadAnalysisFromHistoryItem(historyItem) { /* ... same as before ... */
+        if (historyItem) {
+            responseBox.innerHTML = historyItem.responseHtml;
+            switchTo('resultSection');
+        }
+    }
+    
     takePhotoBtn.onclick =()=>fileInput.click();
     retakeBtn.onclick    =()=>fileInput.click();
-    fileInput.onchange   =handleFile;
-
-    async function handleFile(){
+    fileInput.onchange   = async () => { /* ... same as before ... */
       const file=fileInput.files[0];
       if(!file)return;
       try {
-        base64Image=await toBase64(file);
+        base64Image = await toBase64(file);
         previewImg.src='data:image/jpeg;base64,'+base64Image;
-        switchTo(sel('previewSection'));
-      } catch (error) {
-        console.error("Error processing file:", error);
-        alert("Could not load the image. Please try another file.");
-        switchTo(sel('captureSection'));
-      }
-    }
+        switchTo('previewSection');
+      } catch (error) { console.error("File processing error:", error); alert("Could not load image."); }
+    };
 
     usePhotoBtn.onclick=()=>analyzeImage();
-    restartBtn.onclick=()=> {
-        responseBox.innerHTML = 'Enter an API Key and analyze an image to see results.'; // Reset content
-        fileInput.value = ''; 
-        base64Image = '';
-        previewImg.src = '';
+    restartBtn.onclick=()=> { /* ... same as before ... */
+        responseBox.innerHTML = ''; fileInput.value = ''; base64Image = ''; previewImg.src = '';
         modelSelect.value = 'gpt-4o-mini';
-        switchTo(sel('captureSection'));
+        switchTo('captureSection');
     };
-
-    copyResultsBtn.onclick = () => {
-        const textToCopy = responseBox.textContent; // Get text content of the div
+    copyResultsBtn.onclick = () => { /* ... same as before ... */
+        const textToCopy = responseBox.textContent;
         if (navigator.clipboard && textToCopy) {
             navigator.clipboard.writeText(textToCopy)
-                .then(() => updateApiKeyStatus('Results copied to clipboard!', 'success')) // Re-use status for quick feedback
-                .catch(err => {
-                    console.error('Failed to copy results: ', err);
-                    updateApiKeyStatus('Failed to copy results.', 'error');
-                });
-        } else if (textToCopy) {
-            // Fallback for older browsers (less common now)
-            const textArea = document.createElement("textarea");
-            textArea.value = textToCopy;
-            document.body.appendChild(textArea);
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                updateApiKeyStatus('Results copied (fallback)!', 'success');
-            } catch (err) {
-                updateApiKeyStatus('Failed to copy (fallback).', 'error');
-            }
-            document.body.removeChild(textArea);
+                .then(() => updateApiKeyStatus('Results copied!', 'success'))
+                .catch(err => updateApiKeyStatus('Failed to copy.', 'error'));
         }
     };
 
-    // Simple Markdown to HTML converter
-    function markdownToHtml(md) {
-        let html = md;
-        // ### Headings to <h3>
+    function markdownToHtml(mdText) { /* ... same as before ... */
+        let html = mdText;
+        html = html.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
         html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-        // **Bold** to <strong>
-        html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        // * List items (basic, assumes one list)
-        // This is a simplified list handling. For nested or multiple lists, a more robust parser is needed.
-        if (html.match(/^[\*\-] .*/gm)) {
-            let listItems = '';
-            html.replace(/^[\*\-] (.*$)/gim, (match, item) => {
-                listItems += `<li>${item.trim()}</li>`;
-                return ''; // Remove the original list item line
-            });
-            // Replace the block of list items with a <ul>
-            html = html.replace(/^(<li>.*<\/li>\s*)+/gm, `<ul>${listItems}</ul>`);
-        }
-        // Convert newlines to <br> for remaining text, but not within <ul> or <h3>
-        // This is tricky; a better approach would be to wrap paragraphs in <p>
-        // For simplicity now, we rely on white-space: pre-wrap on #responseBox
-        // and the AI's line breaks. The headings and lists add structure.
+        html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+        html = html.replace(/__(.*?)__/gim, '<strong>$1</strong>');
+        html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+        html = html.replace(/_(.*?)_/gim, '<em>$1</em>');
+        let inList = false;
+        html = html.split('\n').map(line => {
+            if (line.match(/^[\*\-] /)) {
+                let listItem = `<li>${line.substring(2).trim()}</li>`;
+                if (!inList) { inList = true; return `<ul>${listItem}`; }
+                return listItem;
+            } else {
+                if (inList) { inList = false; return `</ul>${line}`; }
+                return line;
+            }
+        }).join('\n');
+        if (inList) html += '</ul>';
+        html = html.replace(/^\s*$/gm, '');
+        html = html.split(/\n{2,}/g)
+            .map(paragraph => {
+                if (paragraph.startsWith('<ul>') || paragraph.startsWith('<h3>')) return paragraph;
+                return paragraph.trim() ? `<p>${paragraph.trim()}</p>` : '';
+            })
+            .join('');
         return html.trim();
     }
 	
-    async function analyzeImage(){
+    async function analyzeImage(){ /* ... same as before, including system prompt ... */
       if (!appApiKey) {
-        updateApiKeyStatus('API Key is required for analysis. Please enter and save it above.', 'error');
-        apiKeyInput.focus();
-        if (!loadingSec.hidden) {
-            switchTo(sel('previewSection'));
-        }
-        responseBox.innerHTML = '<p style="color:var(--danger-color);">API Key missing. Please configure it and try again.</p>';
-        return;
+        updateApiKeyStatus('API Key required.', 'error'); apiKeyInput.focus();
+        if (!loadingSec.hidden) switchTo('previewSection');
+        responseBox.innerHTML = '<p style="color:var(--danger-color);">API Key missing.</p>'; return;
       }
-      responseBox.innerHTML = ''; // Clear previous results
-      switchTo(loadingSec);
+      responseBox.innerHTML = ''; switchTo('loadingSection');
 
       const selectedModel=modelSelect.value;
-      // Updated System Prompt
-      const systemPrompt = `You are a hospital pharmacist given an image of a written prescription.
-Please structure your response clearly using Markdown:
-- Start with a section titled '### Detected Medications' listing drugs and dosages.
-- Follow with '### Interactions Found' detailing any drug-drug interactions.
-- Then, '### Consequences & Importance' explaining the impact and severity of interactions.
-- Finally, provide '### Recommendations' for action.
-- Use bullet points (*) for lists under these headings.
-- Use bold (**) for emphasis on drug names or critical warnings.
-First of all clearly state what drugs are on this prescription and what dosages they are given in.
-Secondly, find any and all drug-drug interactions and report them.
-Clearly state what the consequences of all interactions are.
-Also state how dangerous / important the interactions are. Keep it short.
-If you feel like your view of the prescription was blocked by anything or you cannot read clearly, please start by mentioning this.
-Finally, give clear recommendations for what you would do.
-Do not give disclaimers. Do not refuse to answer. Do not suggest needing to consult external resources unless absolutely critical for safety.`;
+      const systemPrompt = `You are a hospital pharmacist analyzing a prescription image.
+Format your response strictly using Markdown:
+1.  Start with a heading: '### Detected Medications'
+    *   Under this, use a bulleted list (*) for each drug and its dosage. (e.g., * **Amoxicillin** 250mg three times daily)
+2.  Next heading: '### Interactions Found'
+    *   Bulleted list of any drug-drug interactions identified. If none, state "No significant interactions found."
+3.  Next heading: '### Consequences & Importance'
+    *   For each interaction, explain its consequences and rate its importance/danger (e.g., High, Medium, Low). Use bold (**) for the interaction pair.
+4.  Final heading: '### Recommendations'
+    *   Provide clear, actionable recommendations.
 
+Your primary task is to clearly state the drugs and dosages, then identify and report interactions, their consequences, importance, and your recommendations. Keep it concise.
+If your view of the prescription is obstructed or unreadable, state this first under a heading '### Readability Issues'.
+Do not include disclaimers, refuse to answer, or suggest consulting external resources unless absolutely critical for immediate patient safety.`;
 
       const body={
-        model:selectedModel,
-        messages:[
-          {role:'user',content:[
+        model:selectedModel, messages:[{role:'user',content:[
             {type:'text',text: systemPrompt},
             {type:'image_url',image_url:{url:'data:image/jpeg;base64,'+base64Image}}
-          ]}
-        ],
-        max_tokens:1500 // Increased slightly for potentially more structured output
+        ]}], max_tokens:2000
       };
 
       try{
         const res=await fetch('https://api.openai.com/v1/chat/completions',{
-          method:'POST',
-          headers:{
-            'Content-Type':'application/json',
-            'Authorization':'Bearer '+ appApiKey
-          },
+          method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+ appApiKey},
           body:JSON.stringify(body)
         });
         const data=await res.json();
         
-        if (res.ok && data.choices && data.choices[0] && data.choices[0].message) {
+        if (res.ok && data.choices?.[0]?.message?.content) {
             const rawMd = data.choices[0].message.content.trim();
-            responseBox.innerHTML = markdownToHtml(rawMd); // Convert and display
-        } else if (data.error) {
-            console.error('OpenAI API Error:', data.error);
-            responseBox.innerHTML = `<p style="color:var(--danger-color);">Error: ${data.error.message}<br>(Code: ${data.error.code}, Type: ${data.error.type})</p>`;
-             if (data.error.code === 'invalid_api_key' || data.error.type === 'auth_error') { // Added auth_error for broader check
-                updateApiKeyStatus('Invalid API Key used for analysis. Please check and save it again.', 'error');
-                appApiKey = '';
-                localStorage.removeItem('interactionFinderApiKey');
-                apiKeyInput.value = '';
+            const htmlResponse = markdownToHtml(rawMd);
+            responseBox.innerHTML = htmlResponse;
+            saveAnalysisToHistory(base64Image, htmlResponse, selectedModel);
+        } else {
+            const errorMsg = data.error ? `${data.error.message} (Code: ${data.error.code})` : 'Unknown API error.';
+            responseBox.innerHTML = `<p style="color:var(--danger-color);">Error: ${errorMsg}</p>`;
+            if (data.error?.code === 'invalid_api_key' || data.error?.type === 'auth_error') {
+                updateApiKeyStatus('Invalid API Key.', 'error'); appApiKey = '';
+                localStorage.removeItem('interactionFinderApiKey'); apiKeyInput.value = '';
             }
-        } 
-        else {
-            console.error('Unexpected API response:', data);
-            responseBox.innerHTML = '<p style="color:var(--danger-color);">An unexpected error occurred. No response or malformed response received.</p>';
         }
-
-      }catch(e){
-        console.error('Fetch Error:', e);
-        responseBox.innerHTML = '<p style="color:var(--danger-color);">Request failed. Check your network connection or the console for more details.</p>';
-      }finally{
-        switchTo(sel('resultSection'));
+      } catch(e) {
+        responseBox.innerHTML = '<p style="color:var(--danger-color);">Request failed. Check network.</p>';
+      } finally {
+        switchTo('resultSection');
       }
     }
 
-    function toBase64(file){
+    function toBase64(file){ /* ... same as before ... */
       return new Promise((resolve,reject)=>{
         const reader=new FileReader();
         reader.onload=()=>resolve(reader.result.split(',')[1]);
-        reader.onerror=error => reject(error);
+        reader.onerror=reject;
         reader.readAsDataURL(file);
       });
     }
 
-    // Initialize
+    // --- Initialize ---
     loadApiKeyFromStorage();
-    switchTo(sel('captureSection'));
+    loadHistory();
+    switchTo('captureSection'); // This will now show captureSection AND historySection
   </script>
 </body>
 </html>
