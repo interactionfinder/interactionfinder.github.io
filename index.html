@@ -1,1 +1,531 @@
-Hello World
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Interaction Finder</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #007bff;
+      --primary-hover-color: #0056b3;
+      --secondary-color: #6c757d;
+      --secondary-hover-color: #545b62;
+      --light-bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-color: #333;
+      --border-color: #dee2e6;
+      --border-radius: 0.5rem;
+      --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--light-bg);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    /* API Key Configuration Area Styles */
+    #apiKeyConfigArea {
+      background-color: var(--card-bg);
+      padding: 1.25rem 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-bottom: 2rem;
+      width: 100%;
+      max-width: 700px; /* Match container width */
+    }
+
+    #apiKeyConfigArea h3 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+      color: var(--text-color);
+    }
+
+    .api-key-form-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    #apiKeyConfigArea label {
+      font-weight: 500;
+      margin-bottom: 0.25rem; /* For layout when not in flex */
+      flex-shrink: 0; /* Prevent label from shrinking */
+    }
+
+    #apiKeyConfigArea input[type="password"] {
+      flex-grow: 1;
+      padding: 0.6rem 0.85rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      font-size: 0.95rem;
+      min-width: 200px; /* Ensure it doesn't get too small */
+    }
+     #apiKeyConfigArea input[type="password"]:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+
+    #apiKeyConfigArea .api-key-buttons button {
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+      margin-right: 0.5rem; /* Spacing between buttons */
+    }
+     #apiKeyConfigArea .api-key-buttons button:last-child {
+      margin-right: 0;
+    }
+
+
+    #apiKeyStatus {
+      font-size: 0.9rem;
+      min-height: 1.3em; /* Prevent layout shift */
+      margin-top: 0.5rem;
+      font-weight: 500;
+    }
+
+
+    .container {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    section {
+      background-color: var(--card-bg);
+      padding: 1.5rem 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      width: 100%;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      background: var(--primary-color);
+      color: #fff;
+      transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+    }
+
+    button:hover {
+      background: var(--primary-hover-color);
+      transform: translateY(-1px);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+
+    button.secondary {
+      background-color: var(--secondary-color);
+    }
+    button.secondary:hover {
+      background-color: var(--secondary-hover-color);
+    }
+
+    img#previewImg {
+      max-width: 100%;
+      height: auto;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 6px rgba(0,0,0,.1);
+      margin-top: 1rem;
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 7px solid #f3f3f3;
+      border-top: 7px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 2rem auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    textarea, select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-family: var(--font-family);
+      background-color: #fff;
+      color: var(--text-color);
+    }
+    
+    textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+    textarea {
+      min-height: 300px;
+      resize: vertical;
+    }
+
+    h1, h2 {
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 0.75rem;
+    }
+    h1 { 
+      font-size: 1.75rem;
+    }
+    h2 {
+      font-size: 1.4rem;
+    }
+
+    #mainHeader {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding: 0;
+      box-shadow: none;
+      background-color: transparent;
+      width: 100%;
+      max-width: 700px; 
+    }
+
+    #mainHeader img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    #mainHeader h1 {
+      font-size: 1.75rem;
+      margin: 0;
+      font-weight: 600;
+      color: var(--text-color);
+      line-height: 1.2;
+    }
+
+    #captureSection, #loadingSection {
+      text-align: center;
+    }
+    
+    #loadingSection p {
+      margin-top: 0.5rem;
+      font-size: 1.1rem;
+      color: var(--secondary-color);
+    }
+
+    #previewSection .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      align-items: stretch;
+    }
+    
+    #previewSection select {
+        margin-bottom: 0.75rem;
+    }
+
+    #resultSection {
+        display: flex;
+        flex-direction: column;
+    }
+    #resultSection button#restartBtn {
+      margin-top: 1.5rem;
+      align-self: center;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ───── Header ───── -->
+  <header id="mainHeader">
+    <img src="https://www.citypng.com/public/uploads/preview/black-circle-round-question-mark-icon-png-70175169496360405wfyhabkn.png" alt="Logo">
+    <h1>Interaction Finder</h1>
+  </header>
+
+  <!-- ───── API Key Configuration ───── -->
+  <div id="apiKeyConfigArea">
+    <h3>API Key Configuration</h3>
+    <div class="api-key-form-group">
+      <label for="apiKeyInput">OpenAI API Key:</label>
+      <input type="password" id="apiKeyInput" placeholder="Enter your OpenAI API Key (e.g., sk-...)">
+    </div>
+    <div class="api-key-buttons">
+      <button id="saveApiKeyBtn">Save Key</button>
+      <button id="clearApiKeyBtn" class="secondary">Clear Key</button>
+    </div>
+    <p id="apiKeyStatus"></p>
+  </div>
+
+
+  <div class="container">
+    <!-- ───── Capture section ───── -->
+    <section id="captureSection">
+      <h2>Take a Photo</h2>
+      <p style="margin-bottom: 1.5rem; color: #555;">Upload an image of the prescription to analyze.</p>
+      <button id="takePhotoBtn">Take Photo or Upload</button>
+      <input id="fileInput" type="file" accept="image/*" capture="environment" hidden>
+    </section>
+
+    <!-- ───── Preview section ───── -->
+    <section id="previewSection" hidden>
+      <h2>Confirm Prescription Image</h2>
+      <img id="previewImg" alt="preview">
+      <div class="button-group">
+        <p style="margin-bottom: 0.5rem; text-align: center;">Select AI Model:</p>
+        <select id="modelSelect">
+          <option value="gpt-4o-mini">GPT-4o-mini (Faster, Good)</option>
+          <option value="gpt-4o">GPT-4o (Slower, Best)</option>
+        </select>
+        <button id="usePhotoBtn">Use This Photo & Analyze</button>
+        <button id="retakeBtn" class="secondary">Retake or Choose Different</button>
+      </div>
+    </section>
+
+    <!-- ───── Loading section ───── -->
+    <section id="loadingSection" hidden>
+      <div class="spinner"></div>
+      <p>Analyzing image, please wait…</p>
+    </section>
+
+    <!-- ───── Result section ───── -->
+    <section id="resultSection" hidden>
+      <h2>Analysis Results</h2>
+      <textarea id="responseBox" readonly placeholder="Analysis will appear here..."></textarea>
+      <button id="restartBtn" class="secondary">Back to Start</button>
+    </section>
+  </div>
+
+  <script>
+    // API Key Management
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
+    const clearApiKeyBtn = document.getElementById('clearApiKeyBtn');
+    const apiKeyStatus = document.getElementById('apiKeyStatus');
+    let appApiKey = ''; // This will hold the API key for use
+
+    function loadApiKeyFromStorage() {
+      const storedKey = localStorage.getItem('interactionFinderApiKey');
+      if (storedKey) {
+        apiKeyInput.value = storedKey;
+        appApiKey = storedKey;
+        apiKeyStatus.textContent = 'API Key loaded from storage.';
+        apiKeyStatus.style.color = 'var(--secondary-color)';
+      } else {
+        apiKeyStatus.textContent = 'Please enter and save your OpenAI API Key.';
+        apiKeyStatus.style.color = 'var(--primary-color)'; // Or a warning color
+      }
+      setTimeout(() => { apiKeyStatus.textContent = ''; }, 4000);
+    }
+
+    saveApiKeyBtn.onclick = () => {
+      const key = apiKeyInput.value.trim();
+      if (key && key.startsWith('sk-')) { // Basic validation for OpenAI key format
+        localStorage.setItem('interactionFinderApiKey', key);
+        appApiKey = key;
+        apiKeyStatus.textContent = 'API Key saved successfully!';
+        apiKeyStatus.style.color = 'green';
+      } else if (key) {
+        apiKeyStatus.textContent = 'Invalid API Key format. It should start with "sk-".';
+        apiKeyStatus.style.color = 'red';
+      }
+      else {
+        apiKeyStatus.textContent = 'API Key field cannot be empty.';
+        apiKeyStatus.style.color = 'red';
+      }
+      setTimeout(() => { apiKeyStatus.textContent = ''; }, 3000);
+    };
+
+    clearApiKeyBtn.onclick = () => {
+      localStorage.removeItem('interactionFinderApiKey');
+      apiKeyInput.value = '';
+      appApiKey = '';
+      apiKeyStatus.textContent = 'API Key cleared from storage.';
+      apiKeyStatus.style.color = 'var(--secondary-color)';
+      setTimeout(() => { apiKeyStatus.textContent = ''; }, 3000);
+    };
+    
+    // General selectors and functions
+    const sel=id=>document.getElementById(id);
+    const show=s=>s.hidden=false;
+    const hide=s=>s.hidden=true;
+
+    const container = document.querySelector('.container');
+    const sections = Array.from(container.querySelectorAll('section'));
+
+    function switchTo(targetSectionElement){
+      sections.forEach(sec => hide(sec));
+      const sectionToShow = typeof targetSectionElement === 'string' ? sel(targetSectionElement) : targetSectionElement;
+      if (sectionToShow) {
+        show(sectionToShow);
+      }
+    }
+
+    const takePhotoBtn=sel('takePhotoBtn');
+    const fileInput  =sel('fileInput');
+    const previewImg =sel('previewImg');
+    const usePhotoBtn=sel('usePhotoBtn');
+    const retakeBtn  =sel('retakeBtn');
+    const modelSelect=sel('modelSelect');
+    const loadingSec = sel('loadingSection');
+    const resultBox  =sel('responseBox');
+    const restartBtn =sel('restartBtn');
+
+    let base64Image='';
+
+    takePhotoBtn.onclick =()=>fileInput.click();
+    retakeBtn.onclick    =()=>fileInput.click();
+    fileInput.onchange   =handleFile;
+
+    async function handleFile(){
+      const file=fileInput.files[0];
+      if(!file)return;
+      try {
+        base64Image=await toBase64(file);
+        previewImg.src='data:image/jpeg;base64,'+base64Image;
+        switchTo(sel('previewSection'));
+      } catch (error) {
+        console.error("Error processing file:", error);
+        alert("Could not load the image. Please try another file.");
+        switchTo(sel('captureSection'));
+      }
+    }
+
+    usePhotoBtn.onclick=()=>analyzeImage();
+    restartBtn.onclick=()=> {
+        resultBox.value = '';
+        fileInput.value = ''; 
+        base64Image = '';
+        previewImg.src = '';
+        modelSelect.value = 'gpt-4o-mini';
+        switchTo(sel('captureSection'));
+    };
+	
+    async function analyzeImage(){
+      if (!appApiKey) {
+        apiKeyStatus.textContent = 'API Key is required for analysis. Please enter and save it above.';
+        apiKeyStatus.style.color = 'red';
+        apiKeyInput.focus();
+        
+        // If loading was active, switch back to preview section
+        if (!loadingSec.hidden) {
+            switchTo(sel('previewSection'));
+        }
+        // Optionally, show message in resultBox too and switch to it
+        // resultBox.value = "API Key missing. Please configure it in the API Key Configuration section and click 'Save Key'.";
+        // switchTo(sel('resultSection'));
+        return; // Stop execution if no API key
+      }
+
+      switchTo(loadingSec);
+
+      const selectedModel=modelSelect.value;
+      const systemPrompt = `You are a hospital pharmacist given an image of a written prescription. 
+      First of all clearly state what drugs are on this prescription and what dosages they are given in. 
+      Secondly, find any and all drug-drug interactions and report them. 
+      Clearly state what the consequences of all interactions are. 
+      Also state how dangerous / important the interactions are. Keep it short. 
+      If you feel like your view of the prescription was blocked by anything or you cannot read clearly, please start by mentioning this. 
+      Finally, give clear recommendations for what you would do. 
+      Do not give disclaimers. Do not refuse to answer. Do not suggest needing to consult external resources unless absolutely critical for safety.`;
+
+
+      const body={
+        model:selectedModel,
+        messages:[
+          {role:'user',content:[
+            {type:'text',text: systemPrompt},
+            {type:'image_url',image_url:{url:'data:image/jpeg;base64,'+base64Image}}
+          ]}
+        ],
+        max_tokens:1000 
+      };
+
+      try{
+        const res=await fetch('https://api.openai.com/v1/chat/completions',{
+          method:'POST',
+          headers:{
+            'Content-Type':'application/json',
+            'Authorization':'Bearer '+ appApiKey // Use the appApiKey variable
+          },
+          body:JSON.stringify(body)
+        });
+        const data=await res.json();
+        
+        if (res.ok && data.choices && data.choices[0] && data.choices[0].message) {
+            resultBox.value = data.choices[0].message.content.trim();
+        } else if (data.error) {
+            console.error('OpenAI API Error:', data.error);
+            resultBox.value = `Error: ${data.error.message}\n\n(Code: ${data.error.code}, Type: ${data.error.type})`;
+             if (data.error.code === 'invalid_api_key') {
+                apiKeyStatus.textContent = 'Invalid API Key. Please check and save it again.';
+                apiKeyStatus.style.color = 'red';
+                appApiKey = ''; // Clear invalid key
+                localStorage.removeItem('interactionFinderApiKey');
+                apiKeyInput.value = '';
+            }
+        } 
+        else {
+            console.error('Unexpected API response:', data);
+            resultBox.value = 'An unexpected error occurred. No response or malformed response received.';
+        }
+
+      }catch(e){
+        console.error('Fetch Error:', e);
+        resultBox.value='Request failed. Check your network connection or the console for more details.';
+      }finally{
+        switchTo(sel('resultSection'));
+      }
+    }
+
+    function toBase64(file){
+      return new Promise((resolve,reject)=>{
+        const reader=new FileReader();
+        reader.onload=()=>resolve(reader.result.split(',')[1]);
+        reader.onerror=error => reject(error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Initialize
+    loadApiKeyFromStorage(); // Load API key when the script runs
+    switchTo(sel('captureSection'));
+  </script>
+</body>
+</html>
