@@ -39,7 +39,7 @@
     #apiKeyStatus.success { color: var(--success-color); } #apiKeyStatus.error { color: var(--danger-color); } #apiKeyStatus.info { color: var(--secondary-color); }
 
     .page-container { width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 1.5rem; }
-    section { /* This style applies to all section cards now, including history */
+    section {
       background-color: var(--card-bg); padding: 1.25rem 1.5rem; border-radius: var(--border-radius);
       box-shadow: var(--box-shadow); width: 100%;
     }
@@ -51,6 +51,9 @@
     button:hover { background: var(--primary-hover-color); transform: translateY(-1px); }
     button.secondary { background-color: var(--secondary-color); }
     button.secondary:hover { background-color: var(--secondary-hover-color); }
+    button.danger { background-color: var(--danger-color); }
+    button.danger:hover { background-color: #c82333; }
+
 
     img#previewImg { max-width: 100%; height: auto; border-radius: var(--border-radius); box-shadow: 0 2px 6px rgba(0,0,0,.1); margin-top: 1rem; margin-bottom: 1.5rem; display: block; }
     [hidden] { display: none !important; }
@@ -76,8 +79,7 @@
 
     h1, h2 { font-weight: 600; color: var(--text-color); margin-bottom: 0.75rem; }
     h1 { font-size: 1.6rem; } h2 { font-size: 1.3rem; }
-    /* Center h2 for sections that have centered content */
-    #captureSection > h2, #historySection > h2 { text-align: center; }
+    #captureSection > h2, #historySection > .history-header > h2 { text-align: center; }
 
 
     #mainHeader {
@@ -90,32 +92,96 @@
     #loadingSection p { margin-top: 0.5rem; font-size: 1rem; color: var(--secondary-color); }
     #previewSection .button-group { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.2rem; }
     #previewSection select { margin-bottom: 0.6rem; }
-    #resultSection { display: flex; flex-direction: column; }
-    .result-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 1.2rem; gap: 0.8rem; }
-    .result-actions button { flex-grow: 1; }
-    @media (max-width: 480px) { .result-actions { flex-direction: column; } }
+    
+    #resultSection { /* Parent of responseBox and result-actions */
+        display: flex;
+        flex-direction: column;
+        /* align-items: center; Remove if responseBox should be full width */
+    }
+    .result-actions { /* Container for "Copy" and "Back to Start" buttons */
+        display: flex;
+        justify-content: center; /* Center buttons horizontally */
+        align-items: center;
+        margin-top: 1.5rem;    /* Increased margin from responseBox */
+        gap: 1rem;             /* Space between buttons */
+        width: 100%;           /* Allow container to span width for centering */
+    }
+    .result-actions button {
+        flex-grow: 0;          /* Buttons don't grow, take their content size + padding */
+        min-width: 120px;      /* Ensure buttons have a decent minimum width */
+    }
+    @media (max-width: 480px) { /* On small screens, stack buttons */
+        .result-actions {
+            flex-direction: column;
+            align-items: stretch;  /* Make buttons full width of their container */
+        }
+        .result-actions button {
+            width: 100%; /* Buttons take full width when stacked */
+        }
+    }
 
-    /* History section styles remain largely the same, but it's now its own card */
-    /* #historySection { padding-top: 0; } Remove extra top padding if it's its own card */
-    #historySection h2 { margin-bottom: 0.75rem; text-align: center; }
+    .history-header {
+        display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;
+    }
+    .history-header h2 { margin-bottom: 0; flex-grow: 1; text-align: center;}
+    #clearAllHistoryBtn { font-size: 0.8rem; padding: 0.4rem 0.8rem; flex-shrink: 0; }
+
     #historyCarouselContainer { overflow-x: auto; white-space: nowrap; padding-bottom: 1rem; margin-bottom: -1rem; }
     #historyCarousel { display: flex; gap: 0.75rem; }
     .history-item-wrapper {
         display: flex; flex-direction: column; align-items: center;
         text-decoration: none; color: var(--text-color); width: 110px;
+        position: relative;
     }
     .history-item {
         width: 100px; height: 100px; border: 2px solid var(--border-color);
-        border-radius: var(--border-radius); overflow: hidden; cursor: pointer;
+        border-radius: var(--border-radius); overflow: hidden;
+        cursor: pointer;
         transition: border-color 0.2s ease, transform 0.2s ease; margin-bottom: 0.25rem;
+        position: relative;
     }
     .history-item:hover { border-color: var(--primary-color); transform: translateY(-2px); }
     .history-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .history-item-date {
         font-size: 0.75rem; color: var(--secondary-color); text-align: center;
         display: block; white-space: normal; line-height: 1.2;
+        width: 100%;
     }
+    .delete-history-item-btn {
+        position: absolute; top: 3px; right: 3px;
+        background-color: rgba(0, 0, 0, 0.4); color: white;
+        border: none; border-radius: 50%;
+        width: 20px; height: 20px; font-size: 12px; font-weight: bold;
+        line-height: 20px; text-align: center; cursor: pointer;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.2); opacity: 0;
+        transition: opacity 0.2s ease, background-color 0.2s ease; z-index: 10;
+    }
+    .history-item-wrapper:hover .delete-history-item-btn { opacity: 1; }
+    .delete-history-item-btn:hover { background-color: var(--danger-color); }
     #noHistoryMessage { color: var(--secondary-color); font-style: italic; text-align: center; padding: 1rem 0;}
+
+    /* Custom Modal Styles */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex; justify-content: center; align-items: center;
+        z-index: 1000; opacity: 0; visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0s 0.3s linear;
+    }
+    .modal-overlay.active {
+        opacity: 1; visibility: visible;
+        transition: opacity 0.3s ease, visibility 0s 0s linear;
+    }
+    .modal-content {
+        background-color: var(--card-bg); padding: 1.5rem 2rem;
+        border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        width: 90%; max-width: 450px; text-align: center;
+        transform: scale(0.95); transition: transform 0.3s ease;
+    }
+    .modal-overlay.active .modal-content { transform: scale(1); }
+    .modal-content p { margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.5; }
+    .modal-buttons { display: flex; justify-content: center; gap: 1rem; }
+    .modal-buttons button { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
   </style>
 </head>
 <body>
@@ -140,7 +206,7 @@
   </div>
 
   <div class="page-container">
-    <section id="captureSection"> <!-- Only "Take a Photo" elements -->
+    <section id="captureSection">
       <h2>Take a Photo</h2>
       <p style="margin-bottom: 1.2rem; color: #555; font-size: 0.9rem; text-align: center;">
         Upload an image of the prescription to analyze.
@@ -151,12 +217,13 @@
       <input id="fileInput" type="file" accept="image/*" capture="environment" hidden>
     </section>
 
-    <section id="historySection" hidden> <!-- Now its own section, initially hidden by JS -->
-        <h2>Recent Analyses</h2>
+    <section id="historySection" hidden>
+        <div class="history-header">
+            <h2>Recent Analyses</h2>
+            <button id="clearAllHistoryBtn" class="danger">Clear All</button>
+        </div>
         <div id="historyCarouselContainer">
-            <div id="historyCarousel">
-                <!-- History items will be injected here -->
-            </div>
+            <div id="historyCarousel"></div>
         </div>
         <p id="noHistoryMessage" hidden>No recent analyses found.</p>
     </section>
@@ -190,6 +257,17 @@
     </section>
   </div>
 
+  <!-- Custom Modal HTML (add at the end of body) -->
+  <div id="customModalOverlay" class="modal-overlay">
+    <div class="modal-content">
+      <p id="modalMessage">Are you sure?</p>
+      <div class="modal-buttons">
+        <button id="modalConfirmBtn" class="danger">Confirm</button>
+        <button id="modalCancelBtn" class="secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const MAX_HISTORY_ITEMS = 7;
     const HISTORY_STORAGE_KEY = 'interactionFinderHistory';
@@ -204,8 +282,15 @@
           loadingSec = sel('loadingSection'), responseBox  =sel('responseBox'),
           restartBtn =sel('restartBtn'), copyResultsBtn = sel('copyResultsBtn');
     const historyCarousel = sel('historyCarousel'), noHistoryMessage = sel('noHistoryMessage'),
-          historySectionElement = sel('historySection'), // Reference to the new history section card
-          historyCarouselContainer = sel('historyCarouselContainer');
+          historySectionElement = sel('historySection'),
+          historyCarouselContainer = sel('historyCarouselContainer'),
+          clearAllHistoryBtn = sel('clearAllHistoryBtn');
+    
+    const customModalOverlay = sel('customModalOverlay');
+    const modalMessage = sel('modalMessage');
+    const modalConfirmBtn = sel('modalConfirmBtn');
+    const modalCancelBtn = sel('modalCancelBtn');
+    let currentConfirmCallback = null;
 
 
     let appApiKey = '';
@@ -214,267 +299,146 @@
 
     const showEl=el=>el.hidden=false;
     const hideEl=el=>el.hidden=true;
-    // Sections for primary view switching
     const mainViewSections = ['captureSection', 'previewSection', 'loadingSection', 'resultSection'].map(sel);
 
 
     function switchTo(targetSectionId){
-      mainViewSections.forEach(sec => hideEl(sec)); // Hide all main view sections
-      hideEl(historySectionElement); // Always hide history initially in a switch
+      mainViewSections.forEach(sec => hideEl(sec));
+      hideEl(historySectionElement);
 
       const sectionToShow = sel(targetSectionId);
-      if (sectionToShow) {
-        showEl(sectionToShow);
-      }
+      if (sectionToShow) showEl(sectionToShow);
 
-      // Show historySection only if captureSection is the target
       if (targetSectionId === 'captureSection') {
         showEl(historySectionElement);
-        // Ensure carousel container visibility is correct based on history content
         if (analysisHistory.length > 0) {
             hideEl(noHistoryMessage);
             showEl(historyCarouselContainer);
+            showEl(clearAllHistoryBtn);
         } else {
             showEl(noHistoryMessage);
             hideEl(historyCarouselContainer);
+            hideEl(clearAllHistoryBtn);
         }
+      } else {
+        hideEl(clearAllHistoryBtn);
       }
     }
 
-
-    function updateApiKeyStatus(message, type = 'info') { /* ... same as before ... */
-        apiKeyStatus.textContent = message;
-        apiKeyStatus.className = type;
+    function updateApiKeyStatus(message, type = 'info') {
+        apiKeyStatus.textContent = message; apiKeyStatus.className = type;
         if (message) setTimeout(() => { if (apiKeyStatus.textContent === message) apiKeyStatus.textContent = ''; }, 5000);
     }
-
-    function loadApiKeyFromStorage() { /* ... same as before ... */
-      const storedKey = localStorage.getItem('interactionFinderApiKey');
-      if (storedKey) {
-        apiKeyInput.value = storedKey; appApiKey = storedKey;
-        updateApiKeyStatus('API Key loaded.', 'info');
-      } else {
-        updateApiKeyStatus('Please enter and save your OpenAI API Key.', 'info');
-      }
+    function loadApiKeyFromStorage() {
+      const k=localStorage.getItem('interactionFinderApiKey'); if(k){apiKeyInput.value=k;appApiKey=k;updateApiKeyStatus('API Key loaded.','info');}else{updateApiKeyStatus('Please enter API Key.','info');}
     }
-    saveApiKeyBtn.onclick = () => { /* ... same as before ... */
-      const key = apiKeyInput.value.trim();
-      if (key && key.startsWith('sk-')) {
-        localStorage.setItem('interactionFinderApiKey', key); appApiKey = key;
-        updateApiKeyStatus('API Key saved!', 'success');
-      } else { updateApiKeyStatus(key ? 'Invalid API Key format.' : 'API Key cannot be empty.', 'error'); }
+    saveApiKeyBtn.onclick = () => {
+      const k=apiKeyInput.value.trim();if(k&&k.startsWith('sk-')){localStorage.setItem('interactionFinderApiKey',k);appApiKey=k;updateApiKeyStatus('API Key saved!','success');}else{updateApiKeyStatus(k?'Invalid Key.':'Key empty.','error');}
     };
-    testApiKeyBtn.onclick = async () => { /* ... same as before ... */
-        const keyToTest = apiKeyInput.value.trim();
-        if (!keyToTest) { updateApiKeyStatus('Enter an API key to test.', 'error'); return; }
-        updateApiKeyStatus('Testing API Key...', 'info');
-        try {
-            const response = await fetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${keyToTest}` } });
-            if (response.ok) {
-                updateApiKeyStatus('API Key is valid!', 'success');
-                if (keyToTest !== appApiKey) { localStorage.setItem('interactionFinderApiKey', keyToTest); appApiKey = keyToTest; }
-            } else { const err = await response.json(); updateApiKeyStatus(`Test failed: ${err.error?.message || response.statusText}`, 'error'); }
-        } catch (e) { updateApiKeyStatus('Test failed: Network error.', 'error'); }
+    testApiKeyBtn.onclick = async () => {
+      const k=apiKeyInput.value.trim();if(!k){updateApiKeyStatus('Enter key to test.','error');return;} updateApiKeyStatus('Testing...','info');try{const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':`Bearer ${k}`}});if(r.ok){updateApiKeyStatus('Key valid!','success');if(k!==appApiKey){localStorage.setItem('interactionFinderApiKey',k);appApiKey=k;}}else{const e=await r.json();updateApiKeyStatus(`Test failed: ${e.error?.message||r.statusText}`,'error');}}catch(e){updateApiKeyStatus('Test failed: Network.','error');}
     };
-    clearApiKeyBtn.onclick = () => { /* ... same as before ... */
-      localStorage.removeItem('interactionFinderApiKey'); apiKeyInput.value = ''; appApiKey = '';
-      updateApiKeyStatus('API Key cleared.', 'info');
+    clearApiKeyBtn.onclick = () => {
+      localStorage.removeItem('interactionFinderApiKey');apiKeyInput.value='';appApiKey='';updateApiKeyStatus('API Key cleared.','info');
     };
+
+    function showCustomConfirm(message, onConfirm) {
+        modalMessage.textContent = message;
+        currentConfirmCallback = onConfirm;
+        customModalOverlay.classList.add('active');
+    }
+    function hideCustomConfirm() {
+        customModalOverlay.classList.remove('active');
+        currentConfirmCallback = null;
+    }
+    modalConfirmBtn.onclick = () => { if (currentConfirmCallback) currentConfirmCallback(); hideCustomConfirm(); };
+    modalCancelBtn.onclick = hideCustomConfirm;
+    customModalOverlay.onclick = (e) => { if (e.target === customModalOverlay) hideCustomConfirm(); };
 
     function loadHistory() {
         const storedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
         try { analysisHistory = storedHistory ? JSON.parse(storedHistory) : []; }
         catch (e) { analysisHistory = []; localStorage.removeItem(HISTORY_STORAGE_KEY); }
-        renderHistoryCarousel(); // This will also update visibility of container/message
-    }
-
-    function saveAnalysisToHistory(currentBase64Image, responseHtml, modelUsed) {
-        const newHistoryItem = {
-            id: Date.now(), imageBase64: currentBase64Image,
-            responseHtml: responseHtml, modelUsed: modelUsed, timestamp: Date.now()
-        };
-        analysisHistory.unshift(newHistoryItem);
-        if (analysisHistory.length > MAX_HISTORY_ITEMS) analysisHistory.length = MAX_HISTORY_ITEMS;
-        try { localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(analysisHistory)); }
-        catch (e) { console.error("Error saving history (Quota?):", e); }
         renderHistoryCarousel();
     }
-
+    function saveAnalysisToHistory(currentBase64Image, responseHtml, modelUsed) {
+        const newHistoryItem = { id: Date.now(), imageBase64: currentBase64Image, responseHtml: responseHtml, modelUsed: modelUsed, timestamp: Date.now() };
+        analysisHistory.unshift(newHistoryItem);
+        if (analysisHistory.length > MAX_HISTORY_ITEMS) analysisHistory.length = MAX_HISTORY_ITEMS;
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(analysisHistory));
+        renderHistoryCarousel();
+    }
+    function deleteHistoryItem(itemId) {
+        showCustomConfirm('Delete this analysis from history?', () => {
+            analysisHistory = analysisHistory.filter(item => item.id !== itemId);
+            localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(analysisHistory));
+            renderHistoryCarousel();
+        });
+    }
+    clearAllHistoryBtn.onclick = () => {
+        showCustomConfirm('Clear all recent analyses? This cannot be undone.', () => {
+            analysisHistory = [];
+            localStorage.removeItem(HISTORY_STORAGE_KEY);
+            renderHistoryCarousel();
+        });
+    };
     function renderHistoryCarousel() {
-        historyCarousel.innerHTML = ''; // Clear existing items
-        // The visibility of historySectionElement itself is handled by switchTo()
-        // Here we manage the content *within* historySectionElement
-
+        historyCarousel.innerHTML = '';
         if (analysisHistory.length === 0) {
-            showEl(noHistoryMessage);
-            hideEl(historyCarouselContainer);
+            showEl(noHistoryMessage); hideEl(historyCarouselContainer); hideEl(clearAllHistoryBtn);
         } else {
-            hideEl(noHistoryMessage);
-            showEl(historyCarouselContainer);
+            hideEl(noHistoryMessage); showEl(historyCarouselContainer); showEl(clearAllHistoryBtn);
             analysisHistory.forEach(item => {
-                const historyItemWrapper = document.createElement('div');
-                historyItemWrapper.className = 'history-item-wrapper';
-                historyItemWrapper.onclick = () => loadAnalysisFromHistoryItem(item);
-
-                const historyItemDiv = document.createElement('div');
-                historyItemDiv.className = 'history-item';
-
-                const img = document.createElement('img');
-                img.src = `data:image/jpeg;base64,${item.imageBase64}`;
+                const wrapper = document.createElement('div'); wrapper.className = 'history-item-wrapper';
+                const itemDiv = document.createElement('div'); itemDiv.className = 'history-item';
+                itemDiv.addEventListener('click', () => loadAnalysisFromHistoryItem(item));
+                const img = document.createElement('img'); img.src = `data:image/jpeg;base64,${item.imageBase64}`;
                 img.alt = `Analyzed prescription ${new Date(item.timestamp).toLocaleDateString()}`;
-                
-                historyItemDiv.appendChild(img);
-
-                const dateSpan = document.createElement('span');
-                dateSpan.className = 'history-item-date';
-                
-                const date = new Date(item.timestamp);
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                dateSpan.textContent = `${date.getMonth() + 1}/${date.getDate()}/${String(date.getFullYear()).slice(-2)} ${hours}:${minutes}`;
-                
-                historyItemWrapper.appendChild(historyItemDiv);
-                historyItemWrapper.appendChild(dateSpan);
-                historyCarousel.appendChild(historyItemWrapper);
+                itemDiv.appendChild(img);
+                const delBtn = document.createElement('button'); delBtn.className = 'delete-history-item-btn';
+                delBtn.innerHTML = '×'; delBtn.title = 'Delete this analysis';
+                delBtn.onclick = (e) => { e.stopPropagation(); deleteHistoryItem(item.id); };
+                itemDiv.appendChild(delBtn);
+                const dateSpan = document.createElement('span'); dateSpan.className = 'history-item-date';
+                const d = new Date(item.timestamp); const h = String(d.getHours()).padStart(2,'0'); const m = String(d.getMinutes()).padStart(2,'0');
+                dateSpan.textContent = `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)} ${h}:${m}`;
+                wrapper.appendChild(itemDiv); wrapper.appendChild(dateSpan); historyCarousel.appendChild(wrapper);
             });
         }
     }
-
-    function loadAnalysisFromHistoryItem(historyItem) { /* ... same as before ... */
-        if (historyItem) {
-            responseBox.innerHTML = historyItem.responseHtml;
-            switchTo('resultSection');
-        }
+    function loadAnalysisFromHistoryItem(historyItem) {
+        if(historyItem){responseBox.innerHTML=historyItem.responseHtml;switchTo('resultSection');}
     }
-    
     takePhotoBtn.onclick =()=>fileInput.click();
     retakeBtn.onclick    =()=>fileInput.click();
-    fileInput.onchange   = async () => { /* ... same as before ... */
-      const file=fileInput.files[0];
-      if(!file)return;
-      try {
-        base64Image = await toBase64(file);
-        previewImg.src='data:image/jpeg;base64,'+base64Image;
-        switchTo('previewSection');
-      } catch (error) { console.error("File processing error:", error); alert("Could not load image."); }
+    fileInput.onchange   = async () => {
+      const f=fileInput.files[0];if(!f)return;try{base64Image=await toBase64(f);previewImg.src='data:image/jpeg;base64,'+base64Image;switchTo('previewSection');}catch(e){console.error("File error:",e);alert("Could not load image.");}
     };
-
     usePhotoBtn.onclick=()=>analyzeImage();
-    restartBtn.onclick=()=> { /* ... same as before ... */
-        responseBox.innerHTML = ''; fileInput.value = ''; base64Image = ''; previewImg.src = '';
-        modelSelect.value = 'gpt-4o-mini';
-        switchTo('captureSection');
+    restartBtn.onclick=()=> {
+      responseBox.innerHTML='';fileInput.value='';base64Image='';previewImg.src='';modelSelect.value='gpt-4o-mini';switchTo('captureSection');
     };
-    copyResultsBtn.onclick = () => { /* ... same as before ... */
-        const textToCopy = responseBox.textContent;
-        if (navigator.clipboard && textToCopy) {
-            navigator.clipboard.writeText(textToCopy)
-                .then(() => updateApiKeyStatus('Results copied!', 'success'))
-                .catch(err => updateApiKeyStatus('Failed to copy.', 'error'));
-        }
+    copyResultsBtn.onclick = () => {
+      const t=responseBox.textContent;if(navigator.clipboard&&t){navigator.clipboard.writeText(t).then(()=>updateApiKeyStatus('Results copied!','success')).catch(e=>updateApiKeyStatus('Failed to copy.','error'));}
     };
-
-    function markdownToHtml(mdText) { /* ... same as before ... */
-        let html = mdText;
-        html = html.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
-        html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-        html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
-        html = html.replace(/__(.*?)__/gim, '<strong>$1</strong>');
-        html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
-        html = html.replace(/_(.*?)_/gim, '<em>$1</em>');
-        let inList = false;
-        html = html.split('\n').map(line => {
-            if (line.match(/^[\*\-] /)) {
-                let listItem = `<li>${line.substring(2).trim()}</li>`;
-                if (!inList) { inList = true; return `<ul>${listItem}`; }
-                return listItem;
-            } else {
-                if (inList) { inList = false; return `</ul>${line}`; }
-                return line;
-            }
-        }).join('\n');
-        if (inList) html += '</ul>';
-        html = html.replace(/^\s*$/gm, '');
-        html = html.split(/\n{2,}/g)
-            .map(paragraph => {
-                if (paragraph.startsWith('<ul>') || paragraph.startsWith('<h3>')) return paragraph;
-                return paragraph.trim() ? `<p>${paragraph.trim()}</p>` : '';
-            })
-            .join('');
-        return html.trim();
+    function markdownToHtml(mdText) {
+      let h=mdText.replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>');h=h.replace(/^### (.*$)/gim,'<h3>$1</h3>');h=h.replace(/\*\*(.*?)\*\*/gim,'<strong>$1</strong>');h=h.replace(/__(.*?)__/gim,'<strong>$1</strong>');h=h.replace(/\*(.*?)\*/gim,'<em>$1</em>');h=h.replace(/_(.*?)_/gim,'<em>$1</em>');let il=false;h=h.split('\n').map(l=>{if(l.match(/^[\*\-] /)){let i=`<li>${l.substring(2).trim()}</li>`;if(!il){il=true;return `<ul>${i}`;}return i;}else{if(il){il=false;return `</ul>${l}`;}return l;}}).join('\n');if(il)h+='</ul>';h=h.replace(/^\s*$/gm,'');h=h.split(/\n{2,}/g).map(p=>{if(p.startsWith('<ul>')||p.startsWith('<h3>'))return p;return p.trim()?`<p>${p.trim()}</p>`:'';}).join('');return h.trim();
     }
 	
-    async function analyzeImage(){ /* ... same as before, including system prompt ... */
-      if (!appApiKey) {
-        updateApiKeyStatus('API Key required.', 'error'); apiKeyInput.focus();
-        if (!loadingSec.hidden) switchTo('previewSection');
-        responseBox.innerHTML = '<p style="color:var(--danger-color);">API Key missing.</p>'; return;
-      }
-      responseBox.innerHTML = ''; switchTo('loadingSection');
-
-      const selectedModel=modelSelect.value;
-      const systemPrompt = `You are a hospital pharmacist analyzing a prescription image.
+    async function analyzeImage(){
+      if(!appApiKey){updateApiKeyStatus('API Key required.','error');apiKeyInput.focus();if(!loadingSec.hidden)switchTo('previewSection');responseBox.innerHTML='<p style="color:var(--danger-color);">API Key missing.</p>';return;}responseBox.innerHTML='';switchTo('loadingSection');const sm=modelSelect.value;const sp=`You are a hospital pharmacist analyzing a prescription image.
 Format your response strictly using Markdown:
-1.  Start with a heading: '### Detected Medications'
-    *   Under this, use a bulleted list (*) for each drug and its dosage. (e.g., * **Amoxicillin** 250mg three times daily)
-2.  Next heading: '### Interactions Found'
-    *   Bulleted list of any drug-drug interactions identified. If none, state "No significant interactions found."
-3.  Next heading: '### Consequences & Importance'
-    *   For each interaction, explain its consequences and rate its importance/danger (e.g., High, Medium, Low). Use bold (**) for the interaction pair.
-4.  Final heading: '### Recommendations'
-    *   Provide clear, actionable recommendations.
-
-Your primary task is to clearly state the drugs and dosages, then identify and report interactions, their consequences, importance, and your recommendations. Keep it concise.
-If your view of the prescription is obstructed or unreadable, state this first under a heading '### Readability Issues'.
-Do not include disclaimers, refuse to answer, or suggest consulting external resources unless absolutely critical for immediate patient safety.`;
-
-      const body={
-        model:selectedModel, messages:[{role:'user',content:[
-            {type:'text',text: systemPrompt},
-            {type:'image_url',image_url:{url:'data:image/jpeg;base64,'+base64Image}}
-        ]}], max_tokens:2000
-      };
-
-      try{
-        const res=await fetch('https://api.openai.com/v1/chat/completions',{
-          method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+ appApiKey},
-          body:JSON.stringify(body)
-        });
-        const data=await res.json();
-        
-        if (res.ok && data.choices?.[0]?.message?.content) {
-            const rawMd = data.choices[0].message.content.trim();
-            const htmlResponse = markdownToHtml(rawMd);
-            responseBox.innerHTML = htmlResponse;
-            saveAnalysisToHistory(base64Image, htmlResponse, selectedModel);
-        } else {
-            const errorMsg = data.error ? `${data.error.message} (Code: ${data.error.code})` : 'Unknown API error.';
-            responseBox.innerHTML = `<p style="color:var(--danger-color);">Error: ${errorMsg}</p>`;
-            if (data.error?.code === 'invalid_api_key' || data.error?.type === 'auth_error') {
-                updateApiKeyStatus('Invalid API Key.', 'error'); appApiKey = '';
-                localStorage.removeItem('interactionFinderApiKey'); apiKeyInput.value = '';
-            }
-        }
-      } catch(e) {
-        responseBox.innerHTML = '<p style="color:var(--danger-color);">Request failed. Check network.</p>';
-      } finally {
-        switchTo('resultSection');
-      }
+1. Start with '### Detected Medications', list drugs/dosages (* **Drug** Dosage).
+2. Next '### Interactions Found', list interactions. If none, state "No significant interactions found."
+3. Next '### Consequences & Importance', explain impact/severity (High, Medium, Low), bold interaction pair.
+4. Final '### Recommendations', provide clear actions.
+Be concise. If unreadable, state under '### Readability Issues'. No disclaimers/refusals.`;const b={model:sm,messages:[{role:'user',content:[{type:'text',text:sp},{type:'image_url',image_url:{url:'data:image/jpeg;base64,'+base64Image}}]}],max_tokens:2000};try{const rs=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+appApiKey},body:JSON.stringify(b)});const d=await rs.json();if(rs.ok&&d.choices?.[0]?.message?.content){const rm=d.choices[0].message.content.trim();const hr=markdownToHtml(rm);responseBox.innerHTML=hr;saveAnalysisToHistory(base64Image,hr,sm);}else{const em=d.error?`${d.error.message} (Code: ${d.error.code})`:'Unknown API error.';responseBox.innerHTML=`<p style="color:var(--danger-color);">Error: ${em}</p>`;if(d.error?.code==='invalid_api_key'||d.error?.type==='auth_error'){updateApiKeyStatus('Invalid API Key.','error');appApiKey='';localStorage.removeItem('interactionFinderApiKey');apiKeyInput.value='';}}}catch(e){responseBox.innerHTML='<p style="color:var(--danger-color);">Request failed. Check network.</p>';}finally{switchTo('resultSection');}
     }
+    function toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
 
-    function toBase64(file){ /* ... same as before ... */
-      return new Promise((resolve,reject)=>{
-        const reader=new FileReader();
-        reader.onload=()=>resolve(reader.result.split(',')[1]);
-        reader.onerror=reject;
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // --- Initialize ---
     loadApiKeyFromStorage();
     loadHistory();
-    switchTo('captureSection'); // This will now show captureSection AND historySection
+    switchTo('captureSection');
   </script>
 </body>
 </html>
