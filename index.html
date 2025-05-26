@@ -72,14 +72,22 @@
     #responseBox p { margin-bottom: 0.8em; }
 
 
-    select {
+    select, textarea#promptEditor {
       width: 100%; padding: 0.6rem 0.9rem; border: 1px solid var(--border-color);
       border-radius: var(--border-radius); font-size: 0.95rem; background-color: #fff; color: var(--text-color);
+      font-family: var(--font-family);
     }
+    textarea#promptEditor {
+        min-height: 250px; resize: vertical; margin-bottom: 1rem;
+    }
+    textarea#promptEditor:focus, select:focus {
+        outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
 
     h1, h2 { font-weight: 600; color: var(--text-color); margin-bottom: 0.75rem; }
     h1 { font-size: 1.6rem; } h2 { font-size: 1.3rem; }
-    #captureSection > h2, #historySection > .history-header > h2 { text-align: center; }
+    #captureSection > h2, #historySection > .history-header > h2, #promptSection > h2 { text-align: center; }
 
 
     #mainHeader {
@@ -93,31 +101,15 @@
     #previewSection .button-group { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.2rem; }
     #previewSection select { margin-bottom: 0.6rem; }
     
-    #resultSection { /* Parent of responseBox and result-actions */
-        display: flex;
-        flex-direction: column;
-        /* align-items: center; Remove if responseBox should be full width */
+    #resultSection { display: flex; flex-direction: column; }
+    .result-actions {
+        display: flex; justify-content: center; align-items: center;
+        margin-top: 1.5rem; gap: 1rem; width: 100%;
     }
-    .result-actions { /* Container for "Copy" and "Back to Start" buttons */
-        display: flex;
-        justify-content: center; /* Center buttons horizontally */
-        align-items: center;
-        margin-top: 1.5rem;    /* Increased margin from responseBox */
-        gap: 1rem;             /* Space between buttons */
-        width: 100%;           /* Allow container to span width for centering */
-    }
-    .result-actions button {
-        flex-grow: 0;          /* Buttons don't grow, take their content size + padding */
-        min-width: 120px;      /* Ensure buttons have a decent minimum width */
-    }
-    @media (max-width: 480px) { /* On small screens, stack buttons */
-        .result-actions {
-            flex-direction: column;
-            align-items: stretch;  /* Make buttons full width of their container */
-        }
-        .result-actions button {
-            width: 100%; /* Buttons take full width when stacked */
-        }
+    .result-actions button { flex-grow: 0; min-width: 120px; }
+    @media (max-width: 480px) {
+        .result-actions { flex-direction: column; align-items: stretch; }
+        .result-actions button { width: 100%; }
     }
 
     .history-header {
@@ -130,58 +122,57 @@
     #historyCarousel { display: flex; gap: 0.75rem; }
     .history-item-wrapper {
         display: flex; flex-direction: column; align-items: center;
-        text-decoration: none; color: var(--text-color); width: 110px;
-        position: relative;
+        text-decoration: none; color: var(--text-color); width: 110px; position: relative;
     }
     .history-item {
         width: 100px; height: 100px; border: 2px solid var(--border-color);
-        border-radius: var(--border-radius); overflow: hidden;
-        cursor: pointer;
-        transition: border-color 0.2s ease, transform 0.2s ease; margin-bottom: 0.25rem;
-        position: relative;
+        border-radius: var(--border-radius); overflow: hidden; cursor: pointer;
+        transition: border-color 0.2s ease, transform 0.2s ease; margin-bottom: 0.25rem; position: relative;
     }
     .history-item:hover { border-color: var(--primary-color); transform: translateY(-2px); }
     .history-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .history-item-date {
         font-size: 0.75rem; color: var(--secondary-color); text-align: center;
-        display: block; white-space: normal; line-height: 1.2;
-        width: 100%;
+        display: block; white-space: normal; line-height: 1.2; width: 100%;
     }
     .delete-history-item-btn {
-        position: absolute; top: 3px; right: 3px;
-        background-color: rgba(0, 0, 0, 0.4); color: white;
-        border: none; border-radius: 50%;
-        width: 20px; height: 20px; font-size: 12px; font-weight: bold;
-        line-height: 20px; text-align: center; cursor: pointer;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.2); opacity: 0;
-        transition: opacity 0.2s ease, background-color 0.2s ease; z-index: 10;
+        position: absolute; top: 3px; right: 3px; background-color: rgba(0,0,0,0.4); color: white;
+        border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; font-weight: bold;
+        line-height: 20px; text-align: center; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        opacity: 0; transition: opacity 0.2s ease, background-color 0.2s ease; z-index: 10;
     }
     .history-item-wrapper:hover .delete-history-item-btn { opacity: 1; }
     .delete-history-item-btn:hover { background-color: var(--danger-color); }
     #noHistoryMessage { color: var(--secondary-color); font-style: italic; text-align: center; padding: 1rem 0;}
 
-    /* Custom Modal Styles */
     .modal-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        display: flex; justify-content: center; align-items: center;
-        z-index: 1000; opacity: 0; visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0s 0.3s linear;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6);
+        display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0;
+        visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s linear;
     }
-    .modal-overlay.active {
-        opacity: 1; visibility: visible;
-        transition: opacity 0.3s ease, visibility 0s 0s linear;
-    }
+    .modal-overlay.active { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s 0s linear; }
     .modal-content {
-        background-color: var(--card-bg); padding: 1.5rem 2rem;
-        border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        width: 90%; max-width: 450px; text-align: center;
+        background-color: var(--card-bg); padding: 1.5rem 2rem; border-radius: var(--border-radius);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 90%; max-width: 450px; text-align: center;
         transform: scale(0.95); transition: transform 0.3s ease;
     }
     .modal-overlay.active .modal-content { transform: scale(1); }
     .modal-content p { margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.5; }
     .modal-buttons { display: flex; justify-content: center; gap: 1rem; }
     .modal-buttons button { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+
+    #promptCustomizationBtnContainer {
+        text-align: center; margin-top: 0; /* Adjusted: Part of page-container flow, not historySection */
+    }
+    #promptSection .prompt-actions {
+        display: flex; justify-content: space-around; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;
+    }
+     #promptSection .prompt-actions button { flex-grow: 1; min-width: 150px; }
+    #promptStatus {
+        font-size: 0.9rem; min-height: 1.3em; margin-top: 1rem; font-weight: 500; text-align: center;
+    }
+    #promptStatus.success { color: var(--success-color); }
+    #promptStatus.info { color: var(--secondary-color); }
   </style>
 </head>
 <body>
@@ -222,11 +213,14 @@
             <h2>Recent Analyses</h2>
             <button id="clearAllHistoryBtn" class="danger">Clear All</button>
         </div>
-        <div id="historyCarouselContainer">
-            <div id="historyCarousel"></div>
-        </div>
+        <div id="historyCarouselContainer"> <div id="historyCarousel"></div> </div>
         <p id="noHistoryMessage" hidden>No recent analyses found.</p>
     </section>
+
+    <!-- Prompt Customization Button Container - Placed as a sibling to sections -->
+    <div id="promptCustomizationBtnContainer" hidden>
+        <button id="goToPromptCustomizationBtn" class="secondary">Prompt Customization</button>
+    </div>
 
     <section id="previewSection" hidden>
       <h2>Confirm Prescription Image</h2>
@@ -255,9 +249,22 @@
         <button id="restartBtn" class="secondary">Back to Start</button>
       </div>
     </section>
+
+    <section id="promptSection" hidden>
+        <h2>Customize System Prompt</h2>
+        <p style="font-size:0.85rem; color: var(--secondary-color); margin-bottom:1rem;">
+            Modify the instructions given to the AI. Be careful, as significant changes can affect results.
+        </p>
+        <textarea id="promptEditor" rows="10"></textarea>
+        <div class="prompt-actions">
+            <button id="savePromptBtn">Save Prompt</button>
+            <button id="resetPromptBtn" class="secondary">Reset to Default</button>
+            <button id="returnToMainBtn" class="secondary">Return to Main</button>
+        </div>
+        <p id="promptStatus"></p>
+    </section>
   </div>
 
-  <!-- Custom Modal HTML (add at the end of body) -->
   <div id="customModalOverlay" class="modal-overlay">
     <div class="modal-content">
       <p id="modalMessage">Are you sure?</p>
@@ -271,6 +278,21 @@
   <script>
     const MAX_HISTORY_ITEMS = 7;
     const HISTORY_STORAGE_KEY = 'interactionFinderHistory';
+    const CUSTOM_PROMPT_STORAGE_KEY = 'interactionFinderCustomPrompt';
+    const DEFAULT_SYSTEM_PROMPT = `You are a hospital pharmacist analyzing a prescription image.
+Format your response strictly using Markdown:
+1.  Start with a heading: '### Detected Medications'
+    *   Under this, use a bulleted list (*) for each drug and its dosage. (e.g., * **Amoxicillin** 250mg three times daily)
+2.  Next heading: '### Interactions Found'
+    *   Bulleted list of any drug-drug interactions identified. If none, state "No significant interactions found."
+3.  Next heading: '### Consequences & Importance'
+    *   For each interaction, explain its consequences and rate its importance/danger (e.g., High, Medium, Low). Use bold (**) for the interaction pair.
+4.  Final heading: '### Recommendations'
+    *   Provide clear, actionable recommendations.
+
+Your primary task is to clearly state the drugs and dosages, then identify and report interactions, their consequences, importance, and your recommendations. Keep it concise.
+If your view of the prescription is obstructed or unreadable, state this first under a heading '### Readability Issues'.
+Do not include disclaimers, refuse to answer, or suggest consulting external resources unless absolutely critical for immediate patient safety.`;
 
     function sel(id){ return document.getElementById(id); }
     const apiKeyInput = sel('apiKeyInput'), saveApiKeyBtn = sel('saveApiKeyBtn'),
@@ -285,71 +307,67 @@
           historySectionElement = sel('historySection'),
           historyCarouselContainer = sel('historyCarouselContainer'),
           clearAllHistoryBtn = sel('clearAllHistoryBtn');
-    
-    const customModalOverlay = sel('customModalOverlay');
-    const modalMessage = sel('modalMessage');
-    const modalConfirmBtn = sel('modalConfirmBtn');
-    const modalCancelBtn = sel('modalCancelBtn');
-    let currentConfirmCallback = null;
-
+    const customModalOverlay = sel('customModalOverlay'), modalMessage = sel('modalMessage'),
+          modalConfirmBtn = sel('modalConfirmBtn'), modalCancelBtn = sel('modalCancelBtn');
+    const goToPromptCustomizationBtn = sel('goToPromptCustomizationBtn'),
+          promptCustomizationBtnContainer = sel('promptCustomizationBtnContainer'),
+          promptSectionElement = sel('promptSection'), promptEditor = sel('promptEditor'),
+          savePromptBtn = sel('savePromptBtn'), resetPromptBtn = sel('resetPromptBtn'),
+          returnToMainBtn = sel('returnToMainBtn'), promptStatus = sel('promptStatus');
 
     let appApiKey = '';
     let base64Image='';
     let analysisHistory = [];
+    let currentSystemPrompt = DEFAULT_SYSTEM_PROMPT;
+    let currentConfirmCallback = null;
 
     const showEl=el=>el.hidden=false;
     const hideEl=el=>el.hidden=true;
-    const mainViewSections = ['captureSection', 'previewSection', 'loadingSection', 'resultSection'].map(sel);
+    const allPageSections = Array.from(document.querySelector('.page-container').querySelectorAll('section, div#promptCustomizationBtnContainer'));
 
 
     function switchTo(targetSectionId){
-      mainViewSections.forEach(sec => hideEl(sec));
-      hideEl(historySectionElement);
+      allPageSections.forEach(el => hideEl(el)); // Hide all sections and the prompt button container
 
       const sectionToShow = sel(targetSectionId);
       if (sectionToShow) showEl(sectionToShow);
 
       if (targetSectionId === 'captureSection') {
         showEl(historySectionElement);
+        showEl(promptCustomizationBtnContainer);
         if (analysisHistory.length > 0) {
-            hideEl(noHistoryMessage);
-            showEl(historyCarouselContainer);
-            showEl(clearAllHistoryBtn);
+            hideEl(noHistoryMessage); showEl(historyCarouselContainer); showEl(clearAllHistoryBtn);
         } else {
-            showEl(noHistoryMessage);
-            hideEl(historyCarouselContainer);
-            hideEl(clearAllHistoryBtn);
+            showEl(noHistoryMessage); hideEl(historyCarouselContainer); hideEl(clearAllHistoryBtn);
         }
-      } else {
-        hideEl(clearAllHistoryBtn);
       }
     }
-
-    function updateApiKeyStatus(message, type = 'info') {
-        apiKeyStatus.textContent = message; apiKeyStatus.className = type;
-        if (message) setTimeout(() => { if (apiKeyStatus.textContent === message) apiKeyStatus.textContent = ''; }, 5000);
+    
+    function updateStatusWithMessage(element, message, type = 'info', duration = 4000) {
+        element.textContent = message; element.className = type;
+        if (message && duration > 0) { setTimeout(() => { if (element.textContent === message) { element.textContent = ''; element.className = 'info';}}, duration); }
     }
+    function updateApiKeyStatus(message, type = 'info') { updateStatusWithMessage(apiKeyStatus, message, type); }
+    function updatePromptStatus(message, type = 'info') { updateStatusWithMessage(promptStatus, message, type); }
+
     function loadApiKeyFromStorage() {
       const k=localStorage.getItem('interactionFinderApiKey'); if(k){apiKeyInput.value=k;appApiKey=k;updateApiKeyStatus('API Key loaded.','info');}else{updateApiKeyStatus('Please enter API Key.','info');}
     }
     saveApiKeyBtn.onclick = () => {
-      const k=apiKeyInput.value.trim();if(k&&k.startsWith('sk-')){localStorage.setItem('interactionFinderApiKey',k);appApiKey=k;updateApiKeyStatus('API Key saved!','success');}else{updateApiKeyStatus(k?'Invalid Key.':'Key empty.','error');}
+      const k=apiKeyInput.value.trim();if(k&&k.startsWith('sk-')){localStorage.setItem('interactionFinderApiKey',k);appApiKey=k;updateApiKeyStatus('API Key saved!','success');}else{updateApiKeyStatus(k?'Invalid Key format.':'Key cannot be empty.','error');}
     };
     testApiKeyBtn.onclick = async () => {
-      const k=apiKeyInput.value.trim();if(!k){updateApiKeyStatus('Enter key to test.','error');return;} updateApiKeyStatus('Testing...','info');try{const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':`Bearer ${k}`}});if(r.ok){updateApiKeyStatus('Key valid!','success');if(k!==appApiKey){localStorage.setItem('interactionFinderApiKey',k);appApiKey=k;}}else{const e=await r.json();updateApiKeyStatus(`Test failed: ${e.error?.message||r.statusText}`,'error');}}catch(e){updateApiKeyStatus('Test failed: Network.','error');}
+      const k=apiKeyInput.value.trim();if(!k){updateApiKeyStatus('Enter key to test.','error');return;} updateApiKeyStatus('Testing...','info');try{const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':`Bearer ${k}`}});if(r.ok){updateApiKeyStatus('Key valid!','success');if(k!==appApiKey){localStorage.setItem('interactionFinderApiKey',k);appApiKey=k;}}else{const e=await r.json();updateApiKeyStatus(`Test failed: ${e.error?.message||r.statusText}`,'error');}}catch(e){updateApiKeyStatus('Test failed: Network error.','error');}
     };
     clearApiKeyBtn.onclick = () => {
       localStorage.removeItem('interactionFinderApiKey');apiKeyInput.value='';appApiKey='';updateApiKeyStatus('API Key cleared.','info');
     };
 
     function showCustomConfirm(message, onConfirm) {
-        modalMessage.textContent = message;
-        currentConfirmCallback = onConfirm;
-        customModalOverlay.classList.add('active');
+        modalMessage.textContent = message; currentConfirmCallback = onConfirm; customModalOverlay.classList.add('active');
     }
     function hideCustomConfirm() {
-        customModalOverlay.classList.remove('active');
-        currentConfirmCallback = null;
+        customModalOverlay.classList.remove('active'); currentConfirmCallback = null;
     }
     modalConfirmBtn.onclick = () => { if (currentConfirmCallback) currentConfirmCallback(); hideCustomConfirm(); };
     modalCancelBtn.onclick = hideCustomConfirm;
@@ -361,8 +379,8 @@
         catch (e) { analysisHistory = []; localStorage.removeItem(HISTORY_STORAGE_KEY); }
         renderHistoryCarousel();
     }
-    function saveAnalysisToHistory(currentBase64Image, responseHtml, modelUsed) {
-        const newHistoryItem = { id: Date.now(), imageBase64: currentBase64Image, responseHtml: responseHtml, modelUsed: modelUsed, timestamp: Date.now() };
+    function saveAnalysisToHistory(imgBase64, respHtml, model) {
+        const newHistoryItem = { id: Date.now(), imageBase64: imgBase64, responseHtml: respHtml, modelUsed: model, timestamp: Date.now() };
         analysisHistory.unshift(newHistoryItem);
         if (analysisHistory.length > MAX_HISTORY_ITEMS) analysisHistory.length = MAX_HISTORY_ITEMS;
         localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(analysisHistory));
@@ -409,6 +427,35 @@
     function loadAnalysisFromHistoryItem(historyItem) {
         if(historyItem){responseBox.innerHTML=historyItem.responseHtml;switchTo('resultSection');}
     }
+
+    function loadCustomPrompt() {
+        const storedPrompt = localStorage.getItem(CUSTOM_PROMPT_STORAGE_KEY);
+        currentSystemPrompt = storedPrompt ? storedPrompt : DEFAULT_SYSTEM_PROMPT;
+        promptEditor.value = currentSystemPrompt;
+        if(storedPrompt) updatePromptStatus('Custom prompt loaded.','info', 2000);
+    }
+    goToPromptCustomizationBtn.onclick = () => {
+        promptEditor.value = currentSystemPrompt; switchTo('promptSection');
+    };
+    savePromptBtn.onclick = () => {
+        const newPrompt = promptEditor.value.trim();
+        if (newPrompt) {
+            currentSystemPrompt = newPrompt; localStorage.setItem(CUSTOM_PROMPT_STORAGE_KEY, newPrompt);
+            updatePromptStatus('Prompt saved successfully!', 'success');
+        } else {
+            updatePromptStatus('Prompt cannot be empty. Reverted.', 'error');
+            promptEditor.value = currentSystemPrompt; // Revert to current if save was attempted with empty
+        }
+    };
+    resetPromptBtn.onclick = () => {
+        showCustomConfirm("Reset prompt to its original default version?", () => {
+            currentSystemPrompt = DEFAULT_SYSTEM_PROMPT; promptEditor.value = DEFAULT_SYSTEM_PROMPT;
+            localStorage.removeItem(CUSTOM_PROMPT_STORAGE_KEY);
+            updatePromptStatus('Prompt reset to default.', 'info');
+        });
+    };
+    returnToMainBtn.onclick = () => switchTo('captureSection');
+
     takePhotoBtn.onclick =()=>fileInput.click();
     retakeBtn.onclick    =()=>fileInput.click();
     fileInput.onchange   = async () => {
@@ -426,18 +473,30 @@
     }
 	
     async function analyzeImage(){
-      if(!appApiKey){updateApiKeyStatus('API Key required.','error');apiKeyInput.focus();if(!loadingSec.hidden)switchTo('previewSection');responseBox.innerHTML='<p style="color:var(--danger-color);">API Key missing.</p>';return;}responseBox.innerHTML='';switchTo('loadingSection');const sm=modelSelect.value;const sp=`You are a hospital pharmacist analyzing a prescription image.
-Format your response strictly using Markdown:
-1. Start with '### Detected Medications', list drugs/dosages (* **Drug** Dosage).
-2. Next '### Interactions Found', list interactions. If none, state "No significant interactions found."
-3. Next '### Consequences & Importance', explain impact/severity (High, Medium, Low), bold interaction pair.
-4. Final '### Recommendations', provide clear actions.
-Be concise. If unreadable, state under '### Readability Issues'. No disclaimers/refusals.`;const b={model:sm,messages:[{role:'user',content:[{type:'text',text:sp},{type:'image_url',image_url:{url:'data:image/jpeg;base64,'+base64Image}}]}],max_tokens:2000};try{const rs=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+appApiKey},body:JSON.stringify(b)});const d=await rs.json();if(rs.ok&&d.choices?.[0]?.message?.content){const rm=d.choices[0].message.content.trim();const hr=markdownToHtml(rm);responseBox.innerHTML=hr;saveAnalysisToHistory(base64Image,hr,sm);}else{const em=d.error?`${d.error.message} (Code: ${d.error.code})`:'Unknown API error.';responseBox.innerHTML=`<p style="color:var(--danger-color);">Error: ${em}</p>`;if(d.error?.code==='invalid_api_key'||d.error?.type==='auth_error'){updateApiKeyStatus('Invalid API Key.','error');appApiKey='';localStorage.removeItem('interactionFinderApiKey');apiKeyInput.value='';}}}catch(e){responseBox.innerHTML='<p style="color:var(--danger-color);">Request failed. Check network.</p>';}finally{switchTo('resultSection');}
+      if(!appApiKey){updateApiKeyStatus('API Key required.','error');apiKeyInput.focus();if(!loadingSec.hidden)switchTo('previewSection');responseBox.innerHTML='<p style="color:var(--danger-color);">API Key missing.</p>';return;}
+      responseBox.innerHTML='';switchTo('loadingSection');
+      const selectedModel=modelSelect.value;
+      // Using currentSystemPrompt which is loaded/managed by prompt customization functions
+      const body={model:selectedModel,messages:[{role:'user',content:[{type:'text',text:currentSystemPrompt},{type:'image_url',image_url:{url:'data:image/jpeg;base64,'+base64Image}}]}],max_tokens:2000};
+      try{
+        const rs=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+appApiKey},body:JSON.stringify(body)});
+        const d=await rs.json();
+        if(rs.ok&&d.choices?.[0]?.message?.content){
+            const rm=d.choices[0].message.content.trim();const hr=markdownToHtml(rm);
+            responseBox.innerHTML=hr;saveAnalysisToHistory(base64Image,hr,selectedModel);
+        }else{
+            const em=d.error?`${d.error.message} (Code: ${d.error.code})`:'Unknown API error.';
+            responseBox.innerHTML=`<p style="color:var(--danger-color);">Error: ${em}</p>`;
+            if(d.error?.code==='invalid_api_key'||d.error?.type==='auth_error'){updateApiKeyStatus('Invalid API Key.','error');appApiKey='';localStorage.removeItem('interactionFinderApiKey');apiKeyInput.value='';}
+        }
+    }catch(e){responseBox.innerHTML='<p style="color:var(--danger-color);">Request failed. Check network.</p>';}
+    finally{switchTo('resultSection');}
     }
     function toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
 
     loadApiKeyFromStorage();
     loadHistory();
+    loadCustomPrompt(); // Load custom or default prompt
     switchTo('captureSection');
   </script>
 </body>
