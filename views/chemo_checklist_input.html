@@ -1,0 +1,36 @@
+<!-- views/chemo_checklist_input.html -->
+<div id="chemoChecklistViewLocal">
+    <header class="view-header"><h2>Chemotherapy Checklist Assistant (Experimental)</h2></header>
+    <section class="view-section">
+        <div class="chemo-experimental-note">
+            <strong>Pharmacist Experimental Tool:</strong> This tool generates a general safety checklist for chemotherapy order review.
+            It is intended for educational review and to explore AI capabilities.
+            <strong>It DOES NOT replace comprehensive pharmacist verification using institutional protocols, official drug monographs, and complete patient information.</strong>
+            Always apply professional judgment and follow established safety procedures.
+        </div>
+        <div class="tool-form-group">
+            <label for="chemoRegimenInput">Chemotherapy Regimen/Drug(s) Being Reviewed:</label>
+            <input type="text" id="chemoRegimenInput" placeholder="e.g., R-CHOP, Paclitaxel + Carboplatin, Capecitabine">
+        </div>
+        <div class="tool-form-group">
+            <label for="chemoPatientContextInput">Patient Context (Optional - e.g., diagnosis, cycle number, key lab concerns):</label>
+            <textarea id="chemoPatientContextInput" rows="3" placeholder="e.g., DLBCL Cycle 1, NSCLC Adjuvant C2, SCr 1.8"></textarea>
+        </div>
+         <div class="tool-form-group">
+            <label for="chemoModelSelect">Select AI Model:</label>
+            <select id="chemoModelSelect">
+                <option value="gpt-4o">GPT-4o (Most Capable)</option>
+                <option value="gpt-4o-mini">GPT-4o-mini (Balanced)</option>
+            </select>
+        </div>
+        <p id="chemoChecklistStatusMessage" class="tool-status-message"></p>
+        <div id="chemoChecklistLoadingIndicator" class="tool-loading-indicator" hidden>
+            <div class="spinner" style="width:30px; height:30px; border-width:4px;"></div>
+            <p>Generating checklist...</p>
+        </div>
+        <div class="tool-action-buttons">
+            <button id="generateChemoChecklistBtn">Generate Checklist</button>
+            <button id="returnToLandingFromChemoInputBtn" class="secondary" data-action="backToLanding">Back to Main Menu</button>
+        </div>
+    </section>
+</div>

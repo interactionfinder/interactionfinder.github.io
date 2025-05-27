@@ -10,12 +10,15 @@ const DEFAULT_SYSTEM_PROMPT_IF = `You are a hospital pharmacist analyzing a pres
 let appApiKey = '';
 let currentActiveViewName = 'landing'; 
 let currentQuizAnswer = '';
+let currentChemoChecklistItems = [];
+let particleInterval = null;
+
 
 // For Interaction Finder
 let base64ImageIF = ''; 
 let analysisHistoryIF = []; 
 let currentSystemPromptIF = DEFAULT_SYSTEM_PROMPT_IF; 
-let currentConfirmCallbackShared = null; // Use shared modal's callback variable
+let currentConfirmCallbackShared = null; 
 
 // --- Utility Functions ---
 function sel(id) { return document.getElementById(id); }
@@ -45,12 +48,12 @@ async function loadAndSwitchToView(viewName) {
         }
         
         viewContentDiv.innerHTML = viewHTML;
-        currentActiveViewName = viewName; // Keep track of the loaded view's NAME (e.g., 'landing')
+        currentActiveViewName = viewName; 
         window.scrollTo(0, 0);
-        initializeViewSpecificLogic(viewName); // Call to set up event listeners for the new view
+        initializeViewSpecificLogic(viewName); 
     } catch (error) {
         console.error("Error loading view:", error);
-        viewContentDiv.innerHTML = `<p style="color:var(--danger-color); text-align:center;">Error loading content for view "${viewName}". Please check console and file path.</p>`;
+        viewContentDiv.innerHTML = `<p style="color:var(--danger-color); text-align:center;">Error loading content for view "${viewName}". Please check console and file path (ensure the views folder and .html files exist and are correctly named).</p>`;
     }
 }
 
@@ -62,7 +65,7 @@ const clearApiKeyBtnGlobal = sel('clearApiKeyBtnGlobal');
 const apiKeyStatusGlobal = sel('apiKeyStatusGlobal');
 
 function updateStatusWithMessage(element, message, type = 'info', duration = 4000) { 
-    if (!element) { console.warn("updateStatusWithMessage: Element not found to update status for."); return; }
+    if (!element) { /* console.warn("updateStatusWithMessage: Element not found to update status for."); */ return; }
     element.textContent = message; 
     element.className = ''; 
     element.classList.add(type); 
@@ -107,7 +110,6 @@ if(customModalOverlayShared) customModalOverlayShared.onclick = (e) => { if (e.t
 function initializeViewSpecificLogic(viewName) {
     console.log("Initializing logic for view:", viewName);
     
-    // General navigation buttons common to most tool views
     const backToLandingButtons = document.querySelectorAll('[data-action="backToLanding"]');
     backToLandingButtons.forEach(button => {
         button.onclick = () => loadAndSwitchToView('landing');
@@ -131,21 +133,28 @@ function initializeViewSpecificLogic(viewName) {
         initializeAnticoagBridgingLogic();
     } else if (viewName === 'anticoag_result') {
         initializeAnticoagResultLogic();
+    } else if (viewName === 'chemo_checklist_input') {
+        initializeChemoChecklistInputLogic();
+    } else if (viewName === 'chemo_checklist_result') {
+        initializeChemoChecklistResultLogic();
     }
 }
 
 // --- Initialization Functions for Each View ---
 
 function initializeLandingViewLogic() {
-    const buttons = sel('landingViewLocal').querySelectorAll('button[data-view-target]');
+    const landingViewLocal = sel('landingViewLocal'); // Assuming the root div of landing.html has this ID
+    if (!landingViewLocal) { console.error("Landing view local container not found."); return; }
+
+    const buttons = landingViewLocal.querySelectorAll('button[data-view-target]');
     buttons.forEach(button => {
         button.onclick = () => {
             const targetView = button.getAttribute('data-view-target');
             if (targetView) {
                 loadAndSwitchToView(targetView).then(() => {
                     if (targetView === 'drug_quizzer') {
-                         const quizQArea = sel('quizQuestionArea');
-                         if (quizQArea && quizQArea.textContent.includes('Click "New Question"')) { // Check if it's the initial state
+                         const quizQArea = sel('quizQuestionArea'); 
+                         if (quizQArea && quizQArea.textContent.includes('Click "New Question"')) { 
                              if (typeof fetchNewQuizQuestion === 'function') fetchNewQuizQuestion();
                          }
                     }
@@ -156,7 +165,7 @@ function initializeLandingViewLogic() {
 }
 
 function initializeInteractionFinderLogic() {
-    // Selectors (ensure these IDs are in your views/interaction_finder.html)
+    // Selectors specific to Interaction Finder, using IF suffix from its HTML snippet
     const takePhotoBtnIF = sel('takePhotoBtnIF'), 
           fileInputIF = sel('fileInputIF'),
           previewImgIF = sel('previewImgIF'), 
@@ -179,7 +188,7 @@ function initializeInteractionFinderLogic() {
           savePromptBtnIF = sel('savePromptBtnIF'), 
           resetPromptBtnIF = sel('resetPromptBtnIF'),
           returnToMainFromPromptBtnIF = sel('returnToMainFromPromptBtnIF'), 
-          promptStatusIF = sel('promptStatusIF'),
+          promptStatusIFlocal = sel('promptStatusIF'), // Using a local var name for the element
           patientInfoGeneratorBtnExternalIF = sel('patientInfoGeneratorBtnExternalIF'),
           backToLandingViewFromMainBtnIF = sel('backToLandingViewFromMainBtnIF');
 
@@ -192,11 +201,11 @@ function initializeInteractionFinderLogic() {
     }
 
     function switchToMainAppSection(targetSectionId) {
-        if (!sel('interactionFinderViewLocal') || !allIFSectionElements.length) { console.warn("IF View not fully loaded for section switch"); return; }
+        if (!sel('interactionFinderViewLocal') || !allIFSectionElements.length) { console.warn("IF View not fully loaded for section switch to", targetSectionId); return; }
         allIFSectionElements.forEach(el => showHideElement(el, false)); 
-        
         const sectionToShow = sel(targetSectionId); 
         if (sectionToShow) showHideElement(sectionToShow, true); 
+        else console.warn("Target section not found in IF:", targetSectionId);
 
         if (targetSectionId === 'captureSectionIF') { 
             showHideElement(historySectionElementIF, true); 
@@ -212,15 +221,15 @@ function initializeInteractionFinderLogic() {
             } 
         } 
     }
-    function updatePromptStatusDisplay(message, type = 'info') { updateStatusWithMessage(promptStatusIF, message, type); } 
+    function updatePromptStatusDisplay(message, type = 'info') { updateStatusWithMessage(promptStatusIFlocal, message, type); } 
     
-    function loadHistoryIF() { const storedHistory = localStorage.getItem(HISTORY_STORAGE_KEY_IF); try { analysisHistoryIF = storedHistory ? JSON.parse(storedHistory) : []; } catch (e) { analysisHistoryIF = []; localStorage.removeItem(HISTORY_STORAGE_KEY_IF); } renderHistoryCarouselIF(); }
+    function loadHistoryIFInternal() { const storedHistory = localStorage.getItem(HISTORY_STORAGE_KEY_IF); try { analysisHistoryIF = storedHistory ? JSON.parse(storedHistory) : []; } catch (e) { analysisHistoryIF = []; localStorage.removeItem(HISTORY_STORAGE_KEY_IF); } renderHistoryCarouselIF(); }
     function saveAnalysisToHistoryIF(imgBase64, respHtml, model) { const newItem = { id: Date.now(), imageBase64: imgBase64, responseHtml: respHtml, modelUsed: model, timestamp: Date.now() }; analysisHistoryIF.unshift(newItem); if (analysisHistoryIF.length > MAX_HISTORY_ITEMS_IF) analysisHistoryIF.length = MAX_HISTORY_ITEMS_IF; localStorage.setItem(HISTORY_STORAGE_KEY_IF, JSON.stringify(analysisHistoryIF)); renderHistoryCarouselIF(); }
     function deleteHistoryItemIF(itemId) { showSharedConfirm('Delete this analysis from history?', () => { analysisHistoryIF = analysisHistoryIF.filter(item => item.id !== itemId); localStorage.setItem(HISTORY_STORAGE_KEY_IF, JSON.stringify(analysisHistoryIF)); renderHistoryCarouselIF(); }); }
     if(clearAllHistoryBtnIF) clearAllHistoryBtnIF.onclick = () => { showSharedConfirm('Clear all recent analyses? This cannot be undone.', () => { analysisHistoryIF = []; localStorage.removeItem(HISTORY_STORAGE_KEY_IF); renderHistoryCarouselIF(); }); };
-    function renderHistoryCarouselIF() { if(!historyCarouselIF || !noHistoryMessageIF || !historyCarouselContainerIF || !clearAllHistoryBtnIF) return; historyCarouselIF.innerHTML = ''; if (analysisHistoryIF.length === 0) { showHideElement(noHistoryMessageIF,true); showHideElement(historyCarouselContainerIF,false); showHideElement(clearAllHistoryBtnIF,false); } else { showHideElement(noHistoryMessageIF,false); showHideElement(historyCarouselContainerIF,true); showHideElement(clearAllHistoryBtnIF,true); analysisHistoryIF.forEach(item => { const w = document.createElement('div'); w.className = 'history-item-wrapper'; const iDiv = document.createElement('div'); iDiv.className = 'history-item'; iDiv.onclick = () => loadAnalysisFromHistoryItemIF(item); const img = document.createElement('img'); img.src = `data:image/jpeg;base64,${item.imageBase64}`; img.alt = `Analyzed ${new Date(item.timestamp).toLocaleDateString()}`; iDiv.appendChild(img); const del = document.createElement('button'); del.className = 'delete-history-item-btn'; del.innerHTML = '×'; del.title = 'Delete'; del.onclick = (e) => { e.stopPropagation(); deleteHistoryItemIF(item.id); }; iDiv.appendChild(del); const date = document.createElement('span'); date.className = 'history-item-date'; const d=new Date(item.timestamp); date.textContent = `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; w.appendChild(iDiv); w.appendChild(date); historyCarouselIF.appendChild(w); });}}
+    function renderHistoryCarouselIF() { if(!historyCarouselIF || !noHistoryMessageIF || !historyCarouselContainerIF || !clearAllHistoryBtnIF) {console.warn("History carousel elements not all found"); return;} historyCarouselIF.innerHTML = ''; if (analysisHistoryIF.length === 0) { showHideElement(noHistoryMessageIF,true); showHideElement(historyCarouselContainerIF,false); showHideElement(clearAllHistoryBtnIF,false); } else { showHideElement(noHistoryMessageIF,false); showHideElement(historyCarouselContainerIF,true); showHideElement(clearAllHistoryBtnIF,true); analysisHistoryIF.forEach(item => { const w = document.createElement('div'); w.className = 'history-item-wrapper'; const iDiv = document.createElement('div'); iDiv.className = 'history-item'; iDiv.onclick = () => loadAnalysisFromHistoryItemIF(item); const img = document.createElement('img'); img.src = `data:image/jpeg;base64,${item.imageBase64}`; img.alt = `Analyzed ${new Date(item.timestamp).toLocaleDateString()}`; iDiv.appendChild(img); const del = document.createElement('button'); del.className = 'delete-history-item-btn'; del.innerHTML = '×'; del.title = 'Delete'; del.onclick = (e) => { e.stopPropagation(); deleteHistoryItemIF(item.id); }; iDiv.appendChild(del); const date = document.createElement('span'); date.className = 'history-item-date'; const d=new Date(item.timestamp); date.textContent = `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; w.appendChild(iDiv); w.appendChild(date); historyCarouselIF.appendChild(w); });}}
     function loadAnalysisFromHistoryItemIF(item) { if(item && responseBoxIF){ responseBoxIF.innerHTML=item.responseHtml; switchToMainAppSection('resultSectionIF'); } }
-    function loadCustomPromptIF() { const sp = localStorage.getItem(CUSTOM_PROMPT_STORAGE_KEY_IF); currentSystemPromptIF = sp ? sp : DEFAULT_SYSTEM_PROMPT_IF; if(promptEditorIF) promptEditorIF.value = currentSystemPromptIF; if(sp && promptStatusIF) updatePromptStatusDisplay('Custom prompt loaded.','info', 2000); }
+    function loadCustomPromptIFInternal() { const sp = localStorage.getItem(CUSTOM_PROMPT_STORAGE_KEY_IF); currentSystemPromptIF = sp ? sp : DEFAULT_SYSTEM_PROMPT_IF; if(promptEditorIF) promptEditorIF.value = currentSystemPromptIF; if(sp && promptStatusIFlocal) updatePromptStatusDisplay('Custom prompt loaded.','info', 2000); }
     if(goToPromptCustomizationBtnIF) goToPromptCustomizationBtnIF.onclick = () => { if(promptEditorIF) promptEditorIF.value = currentSystemPromptIF; switchToMainAppSection('promptSectionIF'); };
     if(savePromptBtnIF) savePromptBtnIF.onclick = () => { const np = promptEditorIF.value.trim(); if (np) { currentSystemPromptIF = np; localStorage.setItem(CUSTOM_PROMPT_STORAGE_KEY_IF, np); updatePromptStatusDisplay('Prompt saved successfully!', 'success'); } else { updatePromptStatusDisplay('Prompt cannot be empty. Reverted.', 'error'); promptEditorIF.value = currentSystemPromptIF; }};
     if(resetPromptBtnIF) resetPromptBtnIF.onclick = () => { showSharedConfirm("Reset prompt to default?", () => { currentSystemPromptIF = DEFAULT_SYSTEM_PROMPT_IF; promptEditorIF.value = DEFAULT_SYSTEM_PROMPT_IF; localStorage.removeItem(CUSTOM_PROMPT_STORAGE_KEY_IF); updatePromptStatusDisplay('Prompt reset to default.', 'info'); }); };
@@ -230,19 +239,18 @@ function initializeInteractionFinderLogic() {
     if(fileInputIF) fileInputIF.onchange = async () => { const f=fileInputIF.files[0];if(!f)return;try{base64ImageIF=await toBase64IF(f);if(previewImgIF) previewImgIF.src='data:image/jpeg;base64,'+base64ImageIF;switchToMainAppSection('previewSectionIF');}catch(e){console.error("File error:",e);alert("Could not load image.");}};
     if(usePhotoBtnIF) usePhotoBtnIF.onclick=()=>analyzeImageIF();
     if(restartBtnIF) restartBtnIF.onclick=()=> { if(responseBoxIF) responseBoxIF.innerHTML='';if(fileInputIF) fileInputIF.value='';base64ImageIF='';if(previewImgIF) previewImgIF.src='';if(modelSelectIF) modelSelectIF.value='gpt-4o-mini';switchToMainAppSection('captureSectionIF');};
-    if(copyResultsBtnIF) copyResultsBtnIF.onclick = () => { const t=responseBoxIF.textContent;if(navigator.clipboard&&t){navigator.clipboard.writeText(t).then(()=>updateApiKeyDisplayStatus('Results copied!','success', 2000)).catch(e=>updateApiKeyDisplayStatus('Failed to copy.','error', 2000));}};
+    if(copyResultsBtnIF) copyResultsBtnIF.onclick = () => { if(!responseBoxIF) return; const t=responseBoxIF.textContent;if(navigator.clipboard&&t){navigator.clipboard.writeText(t).then(()=>updateApiKeyDisplayStatus('Results copied!','success', 2000)).catch(e=>updateApiKeyDisplayStatus('Failed to copy.','error', 2000));}};
     function markdownToHtmlIF(mdText) { let h = mdText.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>'); h = h.replace(/DRUG\{(.*?)\}/gim, '<span class="highlight-drug">$1</span>'); h = h.replace(/IMPORTANCE\{(High|Medium|Low)\}/gim, (m,s)=>`<span class="highlight-importance-${s.toLowerCase()}">${s}</span>`); h = h.replace(/^### (.*$)/gim, '<h3><span class="section-title-text">$1</span></h3>'); h = h.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>').replace(/__(.*?)__/gim, '<strong>$1</strong>'); h = h.replace(/\*(.*?)\*/gim, '<em>$1</em>').replace(/_(.*?)_/gim, '<em>$1</em>'); let iL=false; h=h.split('\n').map(l=>{const tL=l.trim();if(tL.match(/^[\*\-]\s+/)){let liC=tL.substring(tL.indexOf(' ')+1).trim();let li=`<li>${liC}</li>`;if(!iL){iL=true;return `<ul>${li}`;}return li;}else{let lR=l;if(iL){lR=`</ul>${lR}`;iL=false;}const tNL=lR.trim();if(tNL&&!tNL.startsWith('<h3')&&!tNL.startsWith('<ul>')&&!tNL.endsWith('</ul>')&&!tNL.startsWith('<p>')&&!tNL.endsWith('</p>')){return `<p>${tNL}</p>`;}return lR;}}).join('\n');if(iL)h+='</ul>';h=h.replace(/<\/ul>\s*<p>/gim,'</ul><p>').replace(/<p>\s*<\/p>/gim,'').replace(/\n\s*\n/g,'\n');return h.trim();}
     function addCopySectionButtonsToResponseBoxIF() { if(!responseBoxIF) return; const hs=responseBoxIF.querySelectorAll('h3');hs.forEach(hE=>{let tS=hE.querySelector('.section-title-text');if(!tS){const tT=hE.textContent;hE.innerHTML='';tS=document.createElement('span');tS.className='section-title-text';tS.textContent=tT;hE.appendChild(tS);}if(hE.querySelector('.copy-section-btn'))return; const cB=document.createElement('button');cB.className='copy-section-btn';cB.textContent='Copy';cB.title=`Copy "${tS.textContent}" section`;hE.appendChild(cB);});}
     if(responseBoxIF) responseBoxIF.addEventListener('click', function(event) { if(event.target.classList.contains('copy-section-btn')){const hE=event.target.closest('h3');if(!hE)return;let cTC=hE.querySelector('.section-title-text').textContent+'\n';let nE=hE.nextElementSibling;while(nE&&nE.tagName!=='H3'){if(nE.tagName==='UL'){Array.from(nE.querySelectorAll('li')).forEach(li=>{cTC+=`• ${li.textContent.trim()}\n`;});}else{cTC+=nE.textContent.trim()+'\n';}nE=nE.nextElementSibling;}if(navigator.clipboard){navigator.clipboard.writeText(cTC.trim()).then(()=>updateApiKeyDisplayStatus('Section copied!','success',2000)).catch(err=>updateApiKeyDisplayStatus('Failed to copy.','error',2000));}}});
-    async function analyzeImageIF(){ if(!appApiKey){updateApiKeyDisplayStatus('API Key required.','error');apiKeyInputGlobal.focus();if(loadingSecIF && !loadingSecIF.hidden)switchToMainAppSection('previewSectionIF');if(responseBoxIF) responseBoxIF.innerHTML='<p style="color:var(--danger-color);">API Key missing.</p>';return;} if(responseBoxIF) responseBoxIF.innerHTML='';switchToMainAppSection('loadingSectionIF'); const sM=modelSelectIF.value; const body={model:sM,messages:[{role:'user',content:[{type:'text',text:currentSystemPromptIF},{type:'image_url',image_url:{url:'data:image/jpeg;base64,'+base64ImageIF}}]}],max_tokens:2000}; try{ const rs=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+appApiKey},body:JSON.stringify(body)}); const d=await rs.json(); if(rs.ok&&d.choices?.[0]?.message?.content){ const rm=d.choices[0].message.content.trim(); const hr=markdownToHtmlIF(rm); responseBoxIF.innerHTML=hr; addCopySectionButtonsToResponseBoxIF(); saveAnalysisToHistoryIF(base64ImageIF, responseBoxIF.innerHTML, sM); }else{ const em=d.error?`${d.error.message} (Code: ${d.error.code})`:'Unknown API error.'; responseBoxIF.innerHTML=`<p style="color:var(--danger-color);">Error: ${em}</p>`; if(d.error?.code==='invalid_api_key'||d.error?.type==='auth_error'){updateApiKeyDisplayStatus('Invalid API Key.','error');appApiKey='';localStorage.removeItem(API_KEY_STORAGE_ITEM);if(apiKeyInputGlobal) apiKeyInputGlobal.value='';}}}catch(e){if(responseBoxIF) responseBoxIF.innerHTML='<p style="color:var(--danger-color);">Request failed. Check network.</p>';} finally{switchToMainAppSection('resultSectionIF');}}
+    async function analyzeImageIF(){ if(!appApiKey){updateApiKeyDisplayStatus('API Key required.','error');if(apiKeyInputGlobal) apiKeyInputGlobal.focus();if(loadingSecIF && !loadingSecIF.hidden)switchToMainAppSection('previewSectionIF');if(responseBoxIF) responseBoxIF.innerHTML='<p style="color:var(--danger-color);">API Key missing.</p>';return;} if(responseBoxIF) responseBoxIF.innerHTML='';switchToMainAppSection('loadingSectionIF'); const sM=modelSelectIF.value; const body={model:sM,messages:[{role:'user',content:[{type:'text',text:currentSystemPromptIF},{type:'image_url',image_url:{url:'data:image/jpeg;base64,'+base64ImageIF}}]}],max_tokens:2000}; try{ const rs=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+appApiKey},body:JSON.stringify(body)}); const d=await rs.json(); if(rs.ok&&d.choices?.[0]?.message?.content){ const rm=d.choices[0].message.content.trim(); const hr=markdownToHtmlIF(rm); responseBoxIF.innerHTML=hr; addCopySectionButtonsToResponseBoxIF(); saveAnalysisToHistoryIF(base64ImageIF, responseBoxIF.innerHTML, sM); }else{ const em=d.error?`${d.error.message} (Code: ${d.error.code})`:'Unknown API error.'; responseBoxIF.innerHTML=`<p style="color:var(--danger-color);">Error: ${em}</p>`; if(d.error?.code==='invalid_api_key'||d.error?.type==='auth_error'){updateApiKeyDisplayStatus('Invalid API Key.','error');appApiKey='';localStorage.removeItem(API_KEY_STORAGE_ITEM);if(apiKeyInputGlobal) apiKeyInputGlobal.value='';}}}catch(e){if(responseBoxIF) responseBoxIF.innerHTML='<p style="color:var(--danger-color);">Request failed. Check network.</p>';} finally{switchToMainAppSection('resultSectionIF');}}
     function toBase64IF(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
     
     if(patientInfoGeneratorBtnExternalIF) patientInfoGeneratorBtnExternalIF.onclick = () => { window.open('info.html', '_blank'); }; 
     if(backToLandingViewFromMainBtnIF) backToLandingViewFromMainBtnIF.onclick = () => loadAndSwitchToView('landing');
 
-    // Initial setup specific to Interaction Finder
-    loadHistoryIF();
-    loadCustomPromptIF();
+    loadHistoryIFInternal();
+    loadCustomPromptIFInternal();
     switchToMainAppSection('captureSectionIF'); 
 }
 
@@ -250,7 +258,7 @@ function initializeAdviceGeneratorLogic() {
     const adviceDrugNameInput = sel('adviceDrugNameInput'); 
     const adviceModelSelect = sel('adviceModelSelect'); 
     const generateAdviceActualBtn = sel('generateAdviceActualBtn'); 
-    const returnToLandingViewBtn1 = sel('returnToLandingViewBtn1');
+    const returnToLandingViewBtn1 = sel('returnToLandingViewBtn1'); // Make sure ID is unique in advice_generator.html
     const adviceGeneratorStatusMessage = sel('adviceGeneratorStatusMessage'); 
     const adviceGeneratorLoadingIndicator = sel('adviceGeneratorLoadingIndicator');
 
@@ -313,15 +321,18 @@ function initializeAdviceGeneratorLogic() {
 
 function initializeAdviceResultLogic() {
     const generateNewAdviceBtn = sel('generateNewAdviceBtn');
-    const returnToLandingViewBtn2 = sel('returnToLandingViewBtn2');
+    const returnToLandingViewBtn2 = sel('returnToLandingViewBtn2'); // Make sure ID is unique
     if(generateNewAdviceBtn) generateNewAdviceBtn.onclick = () => loadAndSwitchToView('advice_generator');
     if(returnToLandingViewBtn2) returnToLandingViewBtn2.onclick = () => loadAndSwitchToView('landing');
 }
 function displayAdviceResult(drug, model, adviceHTML) { 
     loadAndSwitchToView('advice_result').then(() => {
-        if(sel('resultAdviceDrugName')) sel('resultAdviceDrugName').textContent = drug; 
-        if(sel('resultAdviceModelUsed')) sel('resultAdviceModelUsed').textContent = model; 
-        if(sel('adviceDisplayArea')) sel('adviceDisplayArea').innerHTML = adviceHTML; 
+        const resultDrugNameEl = sel('resultAdviceDrugName');
+        const resultModelUsedEl = sel('resultAdviceModelUsed');
+        const adviceDisplayAreaEl = sel('adviceDisplayArea');
+        if(resultDrugNameEl) resultDrugNameEl.textContent = drug; 
+        if(resultModelUsedEl) resultModelUsedEl.textContent = model; 
+        if(adviceDisplayAreaEl) adviceDisplayAreaEl.innerHTML = adviceHTML; 
     });
 }
 
@@ -332,7 +343,7 @@ function initializeDosageCalculatorLogic() {
     const dosageRenalFunctionInput = sel('dosageRenalFunctionInput');
     const dosageModelSelect = sel('dosageModelSelect'); 
     const calculateDosageActualBtn = sel('calculateDosageActualBtn');
-    const returnToLandingViewBtn3 = sel('returnToLandingViewBtn3');
+    const returnToLandingViewBtn3 = sel('returnToLandingViewBtn3'); // Make sure ID is unique
     const dosageCalculatorStatusMessage = sel('dosageCalculatorStatusMessage'); 
     const dosageCalculatorLoadingIndicator = sel('dosageCalculatorLoadingIndicator');
 
@@ -391,18 +402,25 @@ function initializeDosageCalculatorLogic() {
 
 function initializeDosageResultLogic() {
     const calculateNewDosageBtn = sel('calculateNewDosageBtn');
-    const returnToLandingViewBtn4 = sel('returnToLandingViewBtn4');
+    const returnToLandingViewBtn4 = sel('returnToLandingViewBtn4'); // Make sure ID is unique
     if(calculateNewDosageBtn) calculateNewDosageBtn.onclick = () => loadAndSwitchToView('dosage_calculator');
     if(returnToLandingViewBtn4) returnToLandingViewBtn4.onclick = () => loadAndSwitchToView('landing');
 }
 function displayDosageResult(drug, weight, age, renal, model, dosageHTML) { 
     loadAndSwitchToView('dosage_result').then(() => {
-        if(sel('resultDosageDrugName')) sel('resultDosageDrugName').textContent = drug; 
-        if(sel('resultDosageWeight')) sel('resultDosageWeight').textContent = weight;
-        if(sel('resultDosageAge')) sel('resultDosageAge').textContent = age;
-        if(sel('resultDosageRenal')) sel('resultDosageRenal').textContent = renal || "Not specified";
-        if(sel('resultDosageModelUsed')) sel('resultDosageModelUsed').textContent = model; 
-        if(sel('dosageDisplayArea')) sel('dosageDisplayArea').innerHTML = dosageHTML; 
+        const resDrug = sel('resultDosageDrugName');
+        const resWeight = sel('resultDosageWeight');
+        const resAge = sel('resultDosageAge');
+        const resRenal = sel('resultDosageRenal');
+        const resModel = sel('resultDosageModelUsed');
+        const dispArea = sel('dosageDisplayArea');
+
+        if(resDrug) resDrug.textContent = drug; 
+        if(resWeight) resWeight.textContent = weight;
+        if(resAge) resAge.textContent = age;
+        if(resRenal) resRenal.textContent = renal || "Not specified";
+        if(resModel) resModel.textContent = model; 
+        if(dispArea) dispArea.innerHTML = dosageHTML; 
     });
 }
 
@@ -414,7 +432,7 @@ function initializeDrugQuizzerLogic() {
     const quizAnswerTitle = sel('quizAnswerTitle');
     const quizzerLoadingIndicator = sel('quizzerLoadingIndicator');
     const quizzerStatusMessage = sel('quizzerStatusMessage');
-    const returnToLandingViewBtn5 = sel('returnToLandingViewBtn5');
+    const returnToLandingViewBtn5 = sel('returnToLandingViewBtn5'); // Make sure ID is unique
 
     function updateQuizzerStatus(message, isError = false, duration = 4000) { 
         if (!quizzerStatusMessage) return; 
@@ -428,7 +446,7 @@ function initializeDrugQuizzerLogic() {
         } 
     }
     
-    async function fetchNewQuizQuestionInternal() { // Renamed to avoid conflict if global fetchNewQuizQuestion is used
+    async function fetchNewQuizQuestionInternal() { 
         if (!appApiKey) { updateQuizzerStatus('API Key is missing. Configure it at the top.', true); if(apiKeyInputGlobal) apiKeyInputGlobal.focus(); return; }
         updateQuizzerStatus(''); 
         if(quizzerLoadingIndicator) quizzerLoadingIndicator.hidden = false; 
@@ -473,9 +491,8 @@ function initializeDrugQuizzerLogic() {
             if(newQuizQuestionBtn) newQuizQuestionBtn.disabled = false; 
         }
     }
-    // Assign to the global scope if needed by landing page, or just keep internal
-    window.fetchNewQuizQuestion = fetchNewQuizQuestionInternal;
-
+    // Make it accessible globally if called from landing page logic
+    window.fetchNewQuizQuestion = fetchNewQuizQuestionInternal; 
 
     if(newQuizQuestionBtn) newQuizQuestionBtn.onclick = fetchNewQuizQuestionInternal;
     if(showQuizAnswerBtn) showQuizAnswerBtn.onclick = () => { 
@@ -500,13 +517,23 @@ function initializeAnticoagBridgingLogic() {
     const anticoagThromboRiskInput = sel('anticoagThromboRiskInput');
     const anticoagModelSelect = sel('anticoagModelSelect');
     const getBridgingInfoBtn = sel('getBridgingInfoBtn');
-    const returnToLandingViewBtn6 = sel('returnToLandingViewBtn6');
+    const returnToLandingViewBtn6 = sel('returnToLandingViewBtn6'); // Make sure ID is unique
     const anticoagBridgingStatusMessage = sel('anticoagBridgingStatusMessage');
     const anticoagBridgingLoadingIndicator = sel('anticoagBridgingLoadingIndicator');
 
     if(anticoagModelSelect) anticoagModelSelect.value = 'gpt-4o'; 
 
-    function updateAnticoagBridgingStatus(message, isError = false, duration = 7000) { /* ... as defined before ... */ }
+    function updateAnticoagBridgingStatus(message, isError = false, duration = 7000) { 
+        if (!anticoagBridgingStatusMessage) return; 
+        anticoagBridgingStatusMessage.textContent = message; 
+        anticoagBridgingStatusMessage.style.color = isError ? 'var(--danger-color)' : 'var(--success-color)'; 
+        if (!isError && message && !message.toLowerCase().includes('error')) { 
+            anticoagBridgingStatusMessage.style.color = 'var(--secondary-color)'; 
+        } 
+        if (message && duration > 0) { 
+            setTimeout(() => { if (anticoagBridgingStatusMessage.textContent === message) anticoagBridgingStatusMessage.textContent = ''; }, duration); 
+        } 
+    }
     
     if(getBridgingInfoBtn) getBridgingInfoBtn.onclick = async () => {
         const currentMed = anticoagCurrentMedInput.value; 
@@ -554,20 +581,279 @@ function initializeAnticoagBridgingLogic() {
 
 function initializeAnticoagResultLogic() {
     const getNewBridgingInfoBtn = sel('getNewBridgingInfoBtn');
-    const returnToLandingViewBtn7 = sel('returnToLandingViewBtn7');
+    const returnToLandingViewBtn7 = sel('returnToLandingViewBtn7'); // Make sure ID is unique
     if(getNewBridgingInfoBtn) getNewBridgingInfoBtn.onclick = () => loadAndSwitchToView('anticoag_bridging');
     if(returnToLandingViewBtn7) returnToLandingViewBtn7.onclick = () => loadAndSwitchToView('landing');
 }
 function displayAnticoagResult(med, proc, risk, model, html) {
     loadAndSwitchToView('anticoag_result').then(() => {
-        if(sel('resultAnticoagMed')) sel('resultAnticoagMed').textContent = med;
-        if(sel('resultAnticoagProcedure')) sel('resultAnticoagProcedure').textContent = proc;
-        if(sel('resultAnticoagThromboRisk')) sel('resultAnticoagThromboRisk').textContent = risk;
-        if(sel('resultAnticoagModelUsed')) sel('resultAnticoagModelUsed').textContent = model;
-        if(sel('anticoagResultDisplayArea')) sel('anticoagResultDisplayArea').innerHTML = html;
+        const resMed = sel('resultAnticoagMed');
+        const resProc = sel('resultAnticoagProcedure');
+        const resRisk = sel('resultAnticoagThromboRisk');
+        const resModel = sel('resultAnticoagModelUsed');
+        const dispArea = sel('anticoagResultDisplayArea');
+        if(resMed) resMed.textContent = med;
+        if(resProc) resProc.textContent = proc;
+        if(resRisk) resRisk.textContent = risk;
+        if(resModel) resModel.textContent = model;
+        if(dispArea) dispArea.innerHTML = html;
     });
 }
 
+function initializeChemoChecklistInputLogic() {
+    const chemoRegimenInput = sel('chemoRegimenInput');
+    const chemoPatientContextInput = sel('chemoPatientContextInput');
+    const chemoModelSelect = sel('chemoModelSelect');
+    const generateChemoChecklistBtn = sel('generateChemoChecklistBtn');
+    const chemoChecklistStatusMessage = sel('chemoChecklistStatusMessage');
+    const chemoChecklistLoadingIndicator = sel('chemoChecklistLoadingIndicator');
+    // Back button is handled by data-action
+
+    if(chemoModelSelect) chemoModelSelect.value = 'gpt-4o'; 
+
+    function updateChemoChecklistStatus(message, isError = false, duration = 7000) {
+        const statusEl = chemoChecklistStatusMessage; // Use the correct variable
+        if (!statusEl) return;
+        statusEl.textContent = message;
+        statusEl.style.color = isError ? 'var(--danger-color)' : 'var(--success-color)';
+        if (!isError && message && !message.toLowerCase().includes('error')) { 
+            statusEl.style.color = 'var(--secondary-color)'; 
+        }
+        if (message && duration > 0) { 
+            setTimeout(() => { if (statusEl.textContent === message) statusEl.textContent = ''; }, duration); 
+        }
+    }
+
+    if(generateChemoChecklistBtn) generateChemoChecklistBtn.onclick = async () => {
+        const regimen = chemoRegimenInput.value.trim();
+        const context = chemoPatientContextInput.value.trim();
+        const selectedModel = chemoModelSelect.value;
+
+        if (!appApiKey) { updateChemoChecklistStatus('API Key is missing.', true); if(apiKeyInputGlobal) apiKeyInputGlobal.focus(); return; }
+        if (!regimen) { updateChemoChecklistStatus('Chemotherapy Regimen/Drug(s) is required.', true); if(chemoRegimenInput) chemoRegimenInput.focus(); return; }
+        
+        updateChemoChecklistStatus(''); 
+        if(chemoChecklistStatusMessage) chemoChecklistStatusMessage.hidden = true;
+        if(chemoChecklistLoadingIndicator) chemoChecklistLoadingIndicator.hidden = false;
+        generateChemoChecklistBtn.disabled = true; 
+        
+        const prompt = `You are an AI assistant helping a hospital pharmacist by generating a general safety checklist for reviewing a chemotherapy order. This checklist is for EXPERIMENTAL AND EDUCATIONAL use and MUST be verified against institutional protocols and official drug information. Regimen/Drug(s) to review: "${regimen}". Optional Patient Context: "${context || 'None provided'}". Generate a list of 10-15 key safety verification points or questions a pharmacist should consider when reviewing this chemotherapy. Focus on common critical checks such as: - Correct diagnosis and indication for the regimen. - Appropriate dose calculation (e.g., BSA, flat dose, AUC) and verification of calculation parameters. - Cycle number and timing within the overall treatment plan. - Pre-medications and supportive care (antiemetics, hydration, growth factors). - Lab parameter checks (e.g., ANC, platelets, renal/hepatic function) prior to administration. - Cumulative dose limits for relevant agents. - Potential for significant drug interactions with patient's other medications (general flag if context provided, otherwise a general point). - Route and rate of administration. - Patient education points to verify. - Double checks required by policy. Provide the output STRICTLY as a JSON array of strings, where each string is a distinct checklist item. Example: [ "Verify patient identifiers (name, DOB, MRN).", "Confirm diagnosis matches indication for the specified regimen: ${regimen}.", "Verify correct chemotherapy drugs, doses, and routes as per protocol for ${regimen}.", "Double-check dose calculations (e.g., BSA, AUC, flat dose). Ensure parameters used (height, weight, SCr) are current and correct.", "Confirm appropriate cycle number and day of therapy for ${regimen}.", "Ensure all necessary pre-medications (e.g., antiemetics, steroids, H1/H2 blockers) are ordered and timed correctly.", "Verify adequate hydration orders are in place, if applicable for ${regimen}.", "Check baseline and current lab values (CBC with differential,特に ANC and platelets, renal function, hepatic function) meet criteria for administration.", "Assess for any relevant cumulative dose limits for agents in ${regimen} (e.g., anthracyclines, bleomycin).", "Review patient's current medication list for significant drug interactions with ${regimen}.", "Confirm appropriate supportive care orders (e.g., growth factors, mouthwash) are present.", "Verify order is signed by an authorized prescriber.", "Ensure patient education on ${regimen}, potential side effects, and when to seek medical attention has been provided/planned." ] Tailor the checklist items to be as relevant as possible to the provided regimen and context, but maintain them as general verification points. If the regimen is very obscure or not recognized, provide a more generic chemotherapy checklist.`;
+        try {
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST', headers: {'Content-Type':'application/json','Authorization':`Bearer ${appApiKey}`},
+                body: JSON.stringify({model: selectedModel, messages: [{ role: 'user', content: prompt }], max_tokens: 800, response_format: { type: "json_object" } }) 
+            });
+            const data = await response.json();
+            if (response.ok && data.choices?.[0]?.message?.content) {
+                try {
+                    let parsedContent = JSON.parse(data.choices[0].message.content);
+                    let checklistArray;
+                    if (Array.isArray(parsedContent)) {
+                        checklistArray = parsedContent;
+                    } else if (parsedContent && typeof parsedContent === 'object' && Array.isArray(Object.values(parsedContent)[0])) {
+                        checklistArray = Object.values(parsedContent)[0];
+                    } else {
+                         throw new Error("AI response was not a direct JSON array or a simple object containing an array.");
+                    }
+                    
+                    if (Array.isArray(checklistArray) && checklistArray.every(item => typeof item === 'string')) {
+                        currentChemoChecklistItems = checklistArray;
+                        displayChemoChecklistResult(regimen, context, `${selectedModel} (API: ${selectedModel})`, currentChemoChecklistItems);
+                    } else {
+                        throw new Error("Parsed checklist is not an array of strings.");
+                    }
+                } catch (parseError) {
+                    console.error("Error parsing AI JSON for checklist:", parseError, "Raw:", data.choices[0].message.content);
+                    updateChemoChecklistStatus('Error processing checklist format from AI.', true);
+                    if(chemoChecklistStatusMessage) chemoChecklistStatusMessage.hidden = false;
+                }
+            } else {
+                const errorMsg = data.error ? `${data.error.message} (Code: ${data.error.code})` : 'Unknown API error.';
+                updateChemoChecklistStatus(`Error generating checklist: ${errorMsg}`, true);
+                if(chemoChecklistStatusMessage) chemoChecklistStatusMessage.hidden = false;
+                if(data.error?.code==='invalid_api_key'||data.error?.type==='auth_error'){ updateApiKeyDisplayStatus('Invalid API Key.','error');appApiKey='';localStorage.removeItem(API_KEY_STORAGE_ITEM);if(apiKeyInputGlobal) apiKeyInputGlobal.value='';}
+            }
+        } catch (error) {
+            console.error("Chemo Checklist Request failed:", error);
+            updateChemoChecklistStatus('Request failed. Check network or console.', true);
+            if(chemoChecklistStatusMessage) chemoChecklistStatusMessage.hidden = false;
+        } finally {
+            if(chemoChecklistLoadingIndicator) chemoChecklistLoadingIndicator.hidden = true;
+            generateChemoChecklistBtn.disabled = false; 
+        }
+    };
+}
+
+function initializeChemoChecklistResultLogic() {
+    const chemoChecklistArea = sel('chemoChecklistArea');
+    const allChemoItemsCheckedMessage = sel('allChemoItemsCheckedMessage');
+    const resetChemoChecklistBtn = sel('resetChemoChecklistBtn');
+    const generateNewChemoChecklistBtn = sel('generateNewChemoChecklistBtn');
+    
+    function renderChemoChecklistInternal(items) { // Renamed to avoid conflict
+        if (!chemoChecklistArea) return;
+        chemoChecklistArea.innerHTML = '';
+        if (!items || items.length === 0) {
+            chemoChecklistArea.innerHTML = '<li>No checklist items generated. Please try again.</li>';
+            return;
+        }
+        items.forEach((itemText, index) => {
+            const li = document.createElement('li');
+            li.className = 'checklist-item';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `chemoItemInstance${index}`; // Unique ID
+            checkbox.dataset.index = index; // Store original index if needed
+            checkbox.addEventListener('change', handleChemoCheckboxChangeInternal);
+            
+            const label = document.createElement('label');
+            label.htmlFor = `chemoItemInstance${index}`;
+            label.textContent = itemText;
+            
+            li.appendChild(checkbox);
+            li.appendChild(label);
+            chemoChecklistArea.appendChild(li);
+        });
+        checkAllChemoItemsCompletedInternal(); 
+    }
+
+    function handleChemoCheckboxChangeInternal(event) {
+        const checkbox = event.target;
+        const listItem = checkbox.closest('li');
+        if (listItem) { // Check if listItem exists
+            if (checkbox.checked) {
+                listItem.classList.add('completed');
+            } else {
+                listItem.classList.remove('completed');
+            }
+        }
+        checkAllChemoItemsCompletedInternal();
+    }
+
+    function checkAllChemoItemsCompletedInternal() {
+        if (!chemoChecklistArea) return;
+        const checkboxes = chemoChecklistArea.querySelectorAll('input[type="checkbox"]');
+        if (checkboxes.length === 0 && currentChemoChecklistItems.length > 0) { // Items were expected but not rendered
+            return; // Avoid triggering particles if list is empty due to render issue
+        }
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        
+        if (allChemoItemsCheckedMessage) {
+            allChemoItemsCheckedMessage.hidden = !allChecked;
+        }
+        if (allChecked && checkboxes.length > 0) {
+            triggerParticleEffect();
+        } else {
+            stopParticleEffect();
+        }
+    }
+    
+    if (resetChemoChecklistBtn) {
+        resetChemoChecklistBtn.onclick = () => {
+            if (!chemoChecklistArea) return;
+            const checkboxes = chemoChecklistArea.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+                const listItem = cb.closest('li');
+                if(listItem) listItem.classList.remove('completed');
+            });
+            if (allChemoItemsCheckedMessage) allChemoItemsCheckedMessage.hidden = true;
+            stopParticleEffect();
+        };
+    }
+
+    if (generateNewChemoChecklistBtn) {
+        generateNewChemoChecklistBtn.onclick = () => loadAndSwitchToView('chemo_checklist_input');
+    }
+
+    if (currentChemoChecklistItems && currentChemoChecklistItems.length > 0) {
+        renderChemoChecklistInternal(currentChemoChecklistItems);
+    } else if (chemoChecklistArea) {
+        chemoChecklistArea.innerHTML = '<li>No checklist data. Generate one from the previous page.</li>';
+    }
+}
+
+function displayChemoChecklistResult(regimen, context, model, items) {
+    currentChemoChecklistItems = items; 
+    loadAndSwitchToView('chemo_checklist_result').then(() => {
+        if(sel('resultChemoRegimenDisplay')) sel('resultChemoRegimenDisplay').textContent = regimen || "N/A";
+        if(sel('resultChemoContextDisplay')) sel('resultChemoContextDisplay').textContent = context || "None provided";
+        if(sel('resultChemoModelUsedDisplay')) sel('resultChemoModelUsedDisplay').textContent = model || "N/A";
+        
+        // The actual rendering of checklist items is now handled by initializeChemoChecklistResultLogic
+        // when the view is fully loaded and that function is called.
+        // We just need to make sure currentChemoChecklistItems is set.
+    });
+}
+
+// --- Particle Effect Logic ---
+// let particleInterval = null; // Moved to global scope
+let particlesCtx = null;
+let particlesArray = [];
+
+function setupParticlesCanvas() {
+    let canvas = sel('particlesCanvas'); 
+    if (!canvas) {
+        console.warn("Particle canvas element ('particlesCanvas') not found in the current view (expected in chemo_checklist_result.html).");
+        return false;
+    }
+    // Ensure canvas is visible and sized correctly for particle effect
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.position = 'fixed'; 
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100vw'; // Use vw/vh to ensure it covers viewport
+    canvas.style.height = '100vh';
+    canvas.style.opacity = '1'; 
+    canvas.style.pointerEvents = 'none'; // Critical
+    canvas.style.zIndex = '2000';      // Critical
+    
+    particlesCtx = canvas.getContext('2d');
+    return true;
+}
+class Particle { /* ... same as before ... */ constructor() { this.x = Math.random() * (particlesCtx?.canvas?.width || window.innerWidth); this.y = Math.random() * (particlesCtx?.canvas?.height || window.innerHeight); this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 3 - 1.5; this.speedY = Math.random() * 3 - 1.5; this.color = `hsl(${Math.random() * 360}, 70%, 60%)`; } update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.05; } draw() { if (!particlesCtx) return; particlesCtx.fillStyle = this.color; particlesCtx.beginPath(); particlesCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2); particlesCtx.fill(); } }
+function initParticles() { particlesArray = []; for (let i = 0; i < 100; i++) { particlesArray.push(new Particle()); } }
+function handleParticles() {
+    if (!particlesCtx) return;
+    particlesCtx.clearRect(0, 0, particlesCtx.canvas.width, particlesCtx.canvas.height);
+    for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+        particlesArray[i].draw();
+        if (particlesArray[i].size <= 0.2) {
+            particlesArray.splice(i, 1); 
+            i--; 
+        }
+    }
+    if (particlesArray.length > 0) {
+        particleInterval = requestAnimationFrame(handleParticles);
+    } else {
+        stopParticleEffect(); 
+    }
+}
+function triggerParticleEffect() {
+    if (!setupParticlesCanvas()) return; // Ensure canvas is ready
+    initParticles();
+    if (particleInterval) cancelAnimationFrame(particleInterval); 
+    particleInterval = requestAnimationFrame(handleParticles);
+    setTimeout(stopParticleEffect, 3000); 
+}
+function stopParticleEffect() {
+    if (particleInterval) {
+        cancelAnimationFrame(particleInterval);
+        particleInterval = null;
+    }
+    const canvas = sel('particlesCanvas'); 
+    if (canvas && particlesCtx) {
+        particlesCtx.clearRect(0, 0, canvas.width, canvas.height);
+        // Make canvas effectively invisible without display:none so it can be reused
+        canvas.style.opacity = '0'; 
+        canvas.style.width = '0px'; 
+        canvas.style.height = '0px';
+    }
+    particlesArray = [];
+}
 
 // --- Initial Application Setup ---
 document.addEventListener('DOMContentLoaded', () => {

@@ -1,0 +1,28 @@
+<!-- views/chemo_checklist_result.html -->
+<div id="chemoChecklistResultViewLocal">
+    <header class="view-header"><h2>Chemotherapy Safety Checklist (Experimental)</h2></header>
+    <section class="view-section">
+         <div class="chemo-experimental-note" style="margin-top:0;">
+            <strong>Pharmacist Experimental Tool - Review Critically:</strong> This AI-generated checklist is a general guide.
+            <strong>Verify ALL items against institutional protocols, official drug monographs, and complete patient-specific information. This is NOT a substitute for thorough pharmacist review.</strong>
+        </div>
+        <div class="result-info-bar">
+            <p><strong>Regimen/Drug(s):</strong> <span id="resultChemoRegimenDisplay">N/A</span></p>
+            <p><strong>Context:</strong> <span id="resultChemoContextDisplay">N/A</span></p>
+            <p><strong>Model Used:</strong> <span id="resultChemoModelUsedDisplay">N/A</span></p>
+        </div>
+        <ul id="chemoChecklistArea" style="list-style-type: none; padding-left: 0;">
+            <!-- Checklist items will be populated here by JavaScript -->
+            <li style="color: var(--secondary-color);">Loading checklist items...</li>
+        </ul>
+        <p id="allChemoItemsCheckedMessage" hidden>All checklist items completed! Great job!</p>
+        
+        <canvas id="particlesCanvas" style="position: absolute; top:0; left:0; width:0; height:0; opacity:0;"></canvas> <!-- Initially hidden and small -->
+
+        <div class="tool-action-buttons" style="margin-top: 2rem;">
+            <button id="resetChemoChecklistBtn" class="secondary">Reset Checklist</button>
+            <button id="generateNewChemoChecklistBtn">New Checklist Scenario</button>
+            <button id="returnToLandingFromChemoResultBtn" class="secondary" data-action="backToLanding">Back to Main Menu</button>
+        </div>
+    </section>
+</div>
