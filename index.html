@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Interaction Finder & Medication Advice</title>
+    <title>Pharmacy Assistant Suite</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +11,8 @@
         :root {
           --primary-color: #007bff; --primary-hover-color: #0056b3; --secondary-color: #6c757d;
           --secondary-hover-color: #545b62; --success-color: #28a745; --danger-color: #dc3545;
-          --purple-color: #6f42c1; --purple-hover-color: #5a32a3;
+          --warning-color: #ffc107; --warning-text-color: #856404; --warning-bg-color: #fff3cd;
+          --purple-color: #6f42c1; --purple-hover-color: #5a32a3; --info-color: #17a2b8; 
           --highlight-drug-bg: #e6f7ff; --highlight-drug-text: #005f8d;
           --highlight-importance-high-bg: #ffe6e6; --highlight-importance-high-text: #c00;
           --highlight-importance-medium-bg: #fff0e6; --highlight-importance-medium-text: #c50;
@@ -26,73 +27,47 @@
           display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 1.5rem 1rem;
         }
         
-        /* --- SHARED STYLES (API Key, Headers, Buttons, Cards) --- */
-        .app-container {
-            width: 100%; max-width: 700px; display: flex; 
-            flex-direction: column; gap: 1.5rem; margin-top: 1.5rem;
-        }
-        #appHeader {
-          display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem; width: 100%; max-width: 700px;
-        }
+        .app-container { width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem; }
+        #appHeader { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem; width: 100%; max-width: 700px; }
         #appHeader img { width: 40px; height: 40px; border-radius: 50%; }
         #appHeader h1 { margin: 0; font-size: 1.6rem; color: var(--text-color); font-weight: 600;}
 
-        #apiKeyConfigArea {
-          background-color: var(--card-bg); padding: 1rem 1.25rem; border-radius: var(--border-radius);
-          box-shadow: var(--box-shadow); width: 100%; max-width: 700px;
-        }
+        #apiKeyConfigArea { background-color: var(--card-bg); padding: 1rem 1.25rem; border-radius: var(--border-radius); box-shadow: var(--box-shadow); width: 100%; max-width: 700px; }
         #apiKeyConfigArea h3 { margin-top: 0; margin-bottom: 0.75rem; font-size: 1.15rem; color: var(--text-color);}
         .api-key-form-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
         #apiKeyConfigArea label { font-weight: 500; flex-shrink: 0; font-size: 0.9rem; color: var(--text-color);}
-        #apiKeyConfigArea input[type="password"] {
-          flex-grow: 1; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color);
-          border-radius: var(--border-radius); font-size: 0.9rem; min-width: 180px;
-          font-family: var(--font-family); color: var(--text-color);
-        }
+        #apiKeyConfigArea input[type="password"] { flex-grow: 1; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 0.9rem; min-width: 180px; font-family: var(--font-family); color: var(--text-color); }
         #apiKeyConfigArea input[type="password"]:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
         #apiKeyConfigArea .api-key-buttons button { padding: 0.5rem 0.9rem; font-size: 0.85rem; margin-right: 0.4rem; }
         #apiKeyConfigArea .api-key-buttons button:last-child { margin-right: 0; }
         #apiKeyConfigArea .api-key-buttons button.test-key { background-color: var(--success-color); }
         #apiKeyConfigArea .api-key-buttons button.test-key:hover { background-color: #1e7e34; }
         #apiKeyStatus { font-size: 0.85rem; min-height: 1.2em; margin-top: 0.4rem; font-weight: 500; }
-        #apiKeyStatus.success { color: var(--success-color); } 
-        #apiKeyStatus.error { color: var(--danger-color); } 
-        #apiKeyStatus.info { color: var(--secondary-color); }
+        #apiKeyStatus.success { color: var(--success-color); } #apiKeyStatus.error { color: var(--danger-color); } #apiKeyStatus.info { color: var(--secondary-color); }
 
-        button {
-          padding: 0.7rem 1.4rem; font-size: 0.95rem; font-weight: 500; border: none;
-          border-radius: var(--border-radius); cursor: pointer; background: var(--primary-color);
-          color: #fff; transition: background-color 0.2s ease-in-out, transform 0.1s ease;
-          font-family: var(--font-family);
-        }
+        button { padding: 0.7rem 1.4rem; font-size: 0.95rem; font-weight: 500; border: none; border-radius: var(--border-radius); cursor: pointer; background: var(--primary-color); color: #fff; transition: background-color 0.2s ease-in-out, transform 0.1s ease; font-family: var(--font-family); }
         button:hover { background: var(--primary-hover-color); transform: translateY(-1px); }
-        button.secondary { background-color: var(--secondary-color); }
-        button.secondary:hover { background-color: var(--secondary-hover-color); }
-        button.danger { background-color: var(--danger-color); }
-        button.danger:hover { background-color: #c82333; }
-        button.purple { background-color: var(--purple-color); }
-        button.purple:hover { background-color: var(--purple-hover-color); }
-        button.green { background-color: var(--success-color); }
-        button.green:hover { background-color: #1e7e34; }
+        button.secondary { background-color: var(--secondary-color); } button.secondary:hover { background-color: var(--secondary-hover-color); }
+        button.danger { background-color: var(--danger-color); } button.danger:hover { background-color: #c82333; }
+        button.purple { background-color: var(--purple-color); } button.purple:hover { background-color: var(--purple-hover-color); }
+        button.green { background-color: var(--success-color); } button.green:hover { background-color: #1e7e34; }
+        button.warning { background-color: var(--warning-color); color: #333; } button.warning:hover { background-color: #e0a800; }
+        button.info { background-color: var(--info-color); color: #fff;} button.info:hover { background-color: #138496; }
         button:disabled { background-color: var(--secondary-color); opacity: 0.7; cursor: not-allowed; transform: translateY(0); }
 
-        .view-section {
-          background-color: var(--card-bg); padding: 1.25rem 1.5rem; border-radius: var(--border-radius);
-          box-shadow: var(--box-shadow); width: 100%;
-        }
-        .view-header {
-          text-align: center; margin-bottom: 1.5rem; width: 100%;
-          background-color: var(--card-bg); padding: 1rem 1.25rem; border-radius: var(--border-radius); box-shadow: var(--box-shadow);
-        }
+        .view-section { background-color: var(--card-bg); padding: 1.25rem 1.5rem; border-radius: var(--border-radius); box-shadow: var(--box-shadow); width: 100%; }
+        .view-header { text-align: center; margin-bottom: 1.5rem; width: 100%; background-color: var(--card-bg); padding: 1rem 1.25rem; border-radius: var(--border-radius); box-shadow: var(--box-shadow); }
         .view-header h2 { margin: 0; font-size: 1.4rem; color: var(--primary-color); font-weight: 600; }
 
-        /* --- LANDING VIEW STYLES --- */
+        /* Landing View */
         #landingView .landing-actions { display: flex; flex-direction: column; gap: 1rem; align-items: center; }
-        #landingView .landing-actions button { width: 100%; max-width: 300px; padding: 0.8rem 1.5rem; font-size: 1rem;}
+        #landingView .landing-actions button { width: 100%; max-width: 350px; padding: 0.8rem 1.5rem; font-size: 1rem;}
         #landingView p { text-align: center; margin-bottom: 1.5rem; color: var(--text-color); font-size: 1.05rem;}
 
-        /* --- MAIN APP VIEW (Original index.html) STYLES --- */
+        /* Main App View (Interaction Finder) - Copied styles from original more completely */
         #mainAppView .page-container { width: 100%; display: flex; flex-direction: column; gap: 1.5rem; }
+        #mainAppView h2 { font-weight: 600; color: var(--text-color); margin-bottom: 0.75rem; font-size: 1.3rem; }
+        #captureSection > h2, #historySection > .history-header > h2, #promptSection > h2 { text-align: center; }
         img#previewImg { max-width: 100%; height: auto; border-radius: var(--border-radius); box-shadow: 0 2px 6px rgba(0,0,0,.1); margin-top: 1rem; margin-bottom: 1.5rem; display: block; }
         .spinner { width: 40px; height: 40px; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 1.5rem auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -107,14 +82,12 @@
         .highlight-importance-high { background-color:var(--highlight-importance-high-bg); color:var(--highlight-importance-high-text); padding:0.1em 0.3em; border-radius:0.2em; font-weight:bold; }
         .highlight-importance-medium { background-color:var(--highlight-importance-medium-bg); color:var(--highlight-importance-medium-text); padding:0.1em 0.3em; border-radius:0.2em; font-weight:500; }
         .highlight-importance-low { background-color:var(--highlight-importance-low-bg); color:var(--highlight-importance-low-text); padding:0.1em 0.3em; border-radius:0.2em; font-weight:500; }
-        select, textarea#promptEditor { width: 100%; padding: 0.6rem 0.9rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 0.95rem; background-color: #fff; color: var(--text-color); font-family: var(--font-family); }
+        #modelSelectIF, textarea#promptEditor { width: 100%; padding: 0.6rem 0.9rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 0.95rem; background-color: #fff; color: var(--text-color); font-family: var(--font-family); }
         textarea#promptEditor { min-height: 250px; resize: vertical; margin-bottom: 1rem; }
-        textarea#promptEditor:focus, select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
-        #mainAppView h2 { font-weight: 600; color: var(--text-color); margin-bottom: 0.75rem; font-size: 1.3rem; }
-        #captureSection > h2, #historySection > .history-header > h2, #promptSection > h2 { text-align: center; }
+        textarea#promptEditor:focus, #modelSelectIF:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
         #loadingSection { text-align: center; } #loadingSection p { margin-top: 0.5rem; font-size: 1rem; color: var(--secondary-color); }
         #previewSection .button-group { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.2rem; }
-        #previewSection select { margin-bottom: 0.6rem; }
+        #previewSection #modelSelectIF { margin-bottom: 0.6rem; }
         #resultSection { display: flex; flex-direction: column; }
         .result-actions { display: flex; justify-content: center; align-items: center; margin-top: 1.5rem; gap: 1rem; width: 100%; }
         .result-actions button { flex-grow: 0; min-width: 120px; }
@@ -143,40 +116,45 @@
         #promptCustomizationBtnContainer { text-align: center; margin-top: 0; }
         #promptSection .prompt-actions { display: flex; justify-content: space-around; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
         #promptSection .prompt-actions button { flex-grow: 1; min-width: 150px; }
-        #promptStatus { font-size: 0.9rem; min-height: 1.3em; margin-top: 1rem; font-weight: 500; text-align: center; }
-        #promptStatus.success { color: var(--success-color); } #promptStatus.info { color: var(--secondary-color); }
-        .main-app-external-buttons-container { /* Container for buttons like Patient Info Generator at bottom of Main App view */
-          width: 100%; max-width: 700px; display: flex; justify-content: center; padding: 1.5rem 0; gap: 1rem;
-        }
+        #promptStatusIF { font-size: 0.9rem; min-height: 1.3em; margin-top: 1rem; font-weight: 500; text-align: center; } /* Renamed from promptStatus */
+        #promptStatusIF.success { color: var(--success-color); } #promptStatusIF.info { color: var(--secondary-color); }
+        .main-app-external-buttons-container { width: 100%; max-width: 700px; display: flex; justify-content: center; padding-top: 0; gap: 1rem; }
 
-        /* --- ADVICE GENERATOR VIEW STYLES --- */
-        #adviceGeneratorView .form-group { margin-bottom: 1rem; }
-        #adviceGeneratorView .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.95rem; color: var(--text-color); }
-        #adviceGeneratorView .form-group input[type="text"], #adviceGeneratorView .form-group select {
-          width: 100%; padding: 0.6rem 0.9rem; border: 1px solid var(--border-color);
-          border-radius: var(--border-radius); font-size: 0.95rem; background-color: #fff; color: var(--text-color);
-          font-family: var(--font-family);
-        }
-        #adviceGeneratorView .form-group input[type="text"]:focus, #adviceGeneratorView .form-group select:focus {
-          outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-        }
-        #adviceGeneratorStatusMessage { text-align:center; min-height:1.2em; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem;}
-        #adviceGeneratorView .action-buttons { display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center; flex-wrap: wrap;}
-        #adviceGeneratorView .action-buttons button { min-width: 150px; }
-        #adviceGeneratorLoadingIndicator { text-align: center; }
-        #adviceGeneratorLoadingIndicator p { margin-top: 0.5rem; color: var(--secondary-color); font-size: 0.9rem;}
+        /* Advice Generator & Dosage Calculator Common Form Styles */
+        .tool-form-group { margin-bottom: 1rem; }
+        .tool-form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.95rem; color: var(--text-color); }
+        .tool-form-group input[type="text"], .tool-form-group input[type="number"], .tool-form-group select, .tool-form-group textarea { width: 100%; padding: 0.6rem 0.9rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 0.95rem; background-color: #fff; color: var(--text-color); font-family: var(--font-family); }
+        .tool-form-group input[type="text"]:focus, .tool-form-group input[type="number"]:focus, .tool-form-group select:focus, .tool-form-group textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
+        .tool-status-message { text-align:center; min-height:1.2em; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem;}
+        .tool-action-buttons { display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center; flex-wrap: wrap;}
+        .tool-action-buttons button { min-width: 150px; }
+        .tool-loading-indicator { text-align: center; }
+        .tool-loading-indicator p { margin-top: 0.5rem; color: var(--secondary-color); font-size: 0.9rem;}
         
-        /* --- ADVICE RESULT VIEW STYLES --- */
-        #adviceResultView #adviceDisplayArea { padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); background-color: #fdfdfd; line-height: 1.7; min-height: 100px; font-size: 0.95rem; }
-        #adviceResultView #adviceDisplayArea p { margin-bottom: 0.8em; } #adviceResultView #adviceDisplayArea p:last-child { margin-bottom: 0; }
-        #adviceResultView .highlight-drugname { background-color: #e6f7ff; color: #005f8d; padding: 0.1em 0.3em; border-radius: 0.25rem; font-weight: 600;}
-        #adviceResultView .highlight-term { background-color: #fffbe6; color: #856404; padding: 0.1em 0.3em; border-radius: 0.25rem; font-style: italic;}
-        #adviceResultView .highlight-benefit { background-color: #e6ffe6; color: #155724; padding: 0.1em 0.3em; border-radius: 0.25rem; font-weight: 500;}
-        #adviceResultView .highlight-caution { background-color: #ffe6e6; color: #721c24; padding: 0.1em 0.3em; border-radius: 0.25rem; font-weight: bold;}
-        #adviceResultView .info-bar { margin-bottom: 1rem; font-size: 0.9rem; color: var(--secondary-color); line-height: 1.5; }
-        #adviceResultView .info-bar strong { color: var(--text-color); font-weight: 600; }
-        #adviceResultView .action-buttons { display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center; flex-wrap: wrap;}
-        #adviceResultView .action-buttons button { min-width: 150px; }
+        /* Advice Result & Dosage Result Common Styles */
+        .result-display-area { padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); background-color: #fdfdfd; line-height: 1.7; min-height: 80px; font-size: 0.95rem; margin-bottom: 1rem; }
+        .result-display-area p { margin-bottom: 0.8em; } .result-display-area p:last-child { margin-bottom: 0; }
+        .result-highlight-drugname { background-color: var(--highlight-drug-bg); color: var(--highlight-drug-text); padding: 0.1em 0.3em; border-radius: 0.25rem; font-weight: 600;}
+        .result-highlight-term { background-color: #fffbe6; color: #856404; padding: 0.1em 0.3em; border-radius: 0.25rem; font-style: italic;}
+        .result-highlight-benefit { background-color: #e6ffe6; color: #155724; padding: 0.1em 0.3em; border-radius: 0.25rem; font-weight: 500;}
+        .result-highlight-caution { background-color: #ffe6e6; color: #721c24; padding: 0.1em 0.3em; border-radius: 0.25rem; font-weight: bold;}
+        .result-highlight-dosage { background-color: var(--warning-bg-color); color: var(--warning-text-color); padding: 0.1em 0.3em; border-radius: 0.25rem; font-weight: bold;}
+        .result-highlight-important-consideration { background-color: #fff3cd; color: var(--warning-text-color); padding: 0.1em 0.3em; border-radius: 0.25rem; font-style: italic;}
+        .result-highlight-disclaimer-ai { color: var(--danger-color); font-weight: bold; border: 1px dashed var(--danger-color); padding: 0.2em 0.4em; display: inline-block; margin-top:0.5em; margin-bottom: 0.5em; background-color: #fee; font-size:0.9em; }
+        .result-info-bar { margin-bottom: 1rem; font-size: 0.9rem; color: var(--secondary-color); line-height: 1.5; }
+        .result-info-bar strong { color: var(--text-color); font-weight: 600; }
+        .dosage-experimental-note { font-size: 0.85rem; color: var(--secondary-color); text-align: center; padding: 0.5rem; margin-bottom: 1rem; border: 1px dashed var(--border-color); border-radius: var(--border-radius); background-color: #f9f9f9; }
+
+        /* Drug Quizzer Specific Styles */
+        #quizQuestionArea, #quizAnswerArea {
+            background-color: #f9f9f9; border: 1px solid var(--border-color);
+            padding: 1rem; border-radius: var(--border-radius);
+            min-height: 60px; margin-bottom: 1rem; font-size: 1rem; line-height: 1.6;
+        }
+        #quizAnswerArea { background-color: #e9f7ef; border-color: var(--success-color); }
+        #quizAnswerArea[hidden] { display: none; } /* Ensure it's truly hidden */
+        #quizzerStatusMessage { text-align: center; margin-bottom: 1rem; min-height: 1.2em; font-weight: 500;}
+
 
         [hidden] { display: none !important; }
     </style>
@@ -205,30 +183,29 @@
     <div class="app-container">
         <!-- VIEW 0: Landing Page -->
         <div id="landingView">
-            <header class="view-header">
-                <h2>Welcome! Select a Tool:</h2>
-            </header>
+            <header class="view-header"><h2>Welcome! Select a Tool:</h2></header>
             <section class="view-section">
                 <p>Choose an option below to get started.</p>
                 <div class="landing-actions">
                     <button id="goToMainAppViewBtn">Interaction Finder</button>
                     <button id="goToAdviceGeneratorFromLandingBtn" class="green">Medication Advice Generator</button>
+                    <button id="goToDosageCalculatorFromLandingBtn" class="warning">Dosage Calculator (Experimental)</button>
+                    <button id="goToDrugQuizzerFromLandingBtn" class="info">Drug Quizzer</button>
                 </div>
             </section>
         </div>
 
         <!-- VIEW 1: Main Interaction Finder App -->
         <div id="mainAppView" hidden>
-            <!-- Header for this specific view section -->
-            <header class="view-header" style="margin-bottom: 0;"> <!-- No extra bottom margin if page-container handles it -->
-                <h2>Prescription Interaction Finder</h2>
-            </header>
+            <header class="view-header" style="margin-bottom: 0;"><h2>Prescription Interaction Finder</h2></header>
             <div class="page-container"> 
                 <section id="captureSection" class="view-section">
                   <h2>Take a Photo</h2>
-                  <p style="margin-bottom: 1.2rem; color: #555; font-size: 0.9rem; text-align: center;">Upload an image of the prescription to analyze.</p>
+                  <p style="margin-bottom: 1.2rem; color: #555; font-size: 0.9rem; text-align: center;">
+                    Upload an image of the prescription to analyze.
+                  </p>
                   <div style="text-align:center;"> <button id="takePhotoBtn">Take Photo or Upload</button> </div>
-                  <input id="fileInput" type="file" accept="image/*" capture="environment" hidden>
+                  <input id="fileInputIF" type="file" accept="image/*" capture="environment" hidden>
                 </section>
                 <section id="historySection" class="view-section" hidden>
                     <div class="history-header"><h2>Recent Analyses</h2><button id="clearAllHistoryBtn" class="danger">Clear All</button></div>
@@ -236,11 +213,12 @@
                     <p id="noHistoryMessage" hidden>No recent analyses found.</p>
                 </section>
                 <div id="promptCustomizationBtnContainer" hidden> <button id="goToPromptCustomizationBtn" class="secondary">Prompt Customization</button> </div>
+				<br>
                 <section id="previewSection" class="view-section" hidden>
                   <h2>Confirm Prescription Image</h2> <img id="previewImg" alt="preview">
                   <div class="button-group">
                     <p style="margin-bottom: 0.5rem; text-align: center; font-size:0.9rem;">Select AI Model:</p>
-                    <select id="modelSelect"><option value="gpt-4o-mini">GPT-4o-mini (Faster, Good)</option><option value="gpt-4o">GPT-4o (Slower, Best)</option></select>
+                    <select id="modelSelectIF"><option value="gpt-4o-mini">GPT-4o-mini (Faster, Good)</option><option value="gpt-4o">GPT-4o (Slower, Best)</option></select>
                     <button id="usePhotoBtn">Use This Photo & Analyze</button> <button id="retakeBtn" class="secondary">Retake or Choose Different</button>
                   </div>
                 </section>
@@ -254,11 +232,11 @@
                     <p style="font-size:0.85rem; color: var(--secondary-color); margin-bottom:1rem;">Modify the instructions given to the AI. Be careful, as significant changes can affect results.</p>
                     <textarea id="promptEditor" rows="10"></textarea>
                     <div class="prompt-actions"><button id="savePromptBtn">Save Prompt</button><button id="resetPromptBtn" class="secondary">Reset to Default</button><button id="returnToMainFromPromptBtn" class="secondary">Return to Main</button></div>
-                    <p id="promptStatus"></p>
+                    <p id="promptStatusIF"></p>
                 </section>
             </div>
-            <div class="main-app-external-buttons-container"> <!-- Renamed for clarity -->
-                 <button id="backToLandingViewFromMainBtn" class="secondary">Back to Main Menu</button>
+            <div class="main-app-external-buttons-container">
+                <button id="backToLandingViewFromMainBtn" class="secondary">Back to Main Menu</button>
             </div>
         </div>
 
@@ -266,25 +244,24 @@
         <div id="adviceGeneratorView" hidden>
             <header class="view-header"><h2>Generate Medication Advice</h2></header>
             <section class="view-section">
-                <div class="form-group">
+                <div class="tool-form-group">
                     <label for="adviceDrugNameInput">Drug Name:</label>
-                    <input type="text" id="adviceDrugNameInput" placeholder="e.g., Amoxicillin">
+                    <input type="text" id="adviceDrugNameInput" placeholder="e.g., Amoxicillin" class="tool-input">
                 </div>
-                <div class="form-group">
+                <div class="tool-form-group">
                     <label for="adviceModelSelect">Select AI Model:</label>
-                    <select id="adviceModelSelect">
+                    <select id="adviceModelSelect" class="tool-select">
                         <option value="gpt-4o-mini">GPT-4o-mini</option>
                         <option value="gpt-3.5-turbo">GPT-3.5-Turbo</option>
                         <option value="gpt-4o">GPT-4o</option>
-                        <!-- Removed o3-mini as it's mapped in JS and might confuse user if listed explicitly -->
                     </select>
                 </div>
-                <p id="adviceGeneratorStatusMessage"></p>
-                <div id="adviceGeneratorLoadingIndicator" hidden>
+                <p id="adviceGeneratorStatusMessage" class="tool-status-message"></p>
+                <div id="adviceGeneratorLoadingIndicator" class="tool-loading-indicator" hidden>
                     <div class="spinner" style="width:30px; height:30px; border-width:4px;"></div>
-                    <p>Generating advice, please wait...</p>
+                    <p>Generating advice...</p>
                 </div>
-                <div class="action-buttons">
+                <div class="tool-action-buttons">
                     <button id="generateAdviceActualBtn">Generate Advice</button>
                     <button id="returnToLandingViewBtn1" class="secondary">Back to Main Menu</button>
                 </div>
@@ -295,20 +272,117 @@
         <div id="adviceResultView" hidden>
             <header class="view-header"><h2>Medication Advice Result</h2></header>
             <section class="view-section">
-                <div class="info-bar">
-                    <p><strong>Drug:</strong> <span id="resultDrugName">N/A</span></p>
-                    <p><strong>Model Used:</strong> <span id="resultModelUsed">N/A</span></p>
+                <div class="result-info-bar">
+                    <p><strong>Drug:</strong> <span id="resultAdviceDrugName">N/A</span></p>
+                    <p><strong>Model Used:</strong> <span id="resultAdviceModelUsed">N/A</span></p>
                 </div>
-                <div id="adviceDisplayArea"><p style="color: var(--secondary-color);">Loading advice...</p></div>
-                <div class="action-buttons">
+                <div id="adviceDisplayArea" class="result-display-area"><p style="color: var(--secondary-color);">Loading advice...</p></div>
+                <div class="tool-action-buttons">
                     <button id="generateNewAdviceBtn">Generate New Advice</button>
                     <button id="returnToLandingViewBtn2" class="secondary">Back to Main Menu</button>
                 </div>
             </section>
         </div>
+
+        <!-- VIEW 4: Dosage Calculator -->
+        <div id="dosageCalculatorView" hidden>
+            <header class="view-header"><h2>Dosage Calculator (Experimental Tool)</h2></header>
+            <section class="view-section">
+                <p class="dosage-experimental-note">
+                    <strong>Note for Pharmacists:</strong> This tool provides AI-generated dosage information based on general guidelines for experimental and educational purposes. Always verify with official drug monographs and apply professional clinical judgment.
+                </p>
+                <div class="tool-form-group">
+                    <label for="dosageDrugNameInput">Drug Name:</label>
+                    <input type="text" id="dosageDrugNameInput" placeholder="e.g., Amoxicillin">
+                </div>
+                <div class="tool-form-group">
+                    <label for="dosagePatientWeightInput">Patient Weight (kg):</label>
+                    <input type="number" id="dosagePatientWeightInput" placeholder="e.g., 70" min="0" step="any">
+                </div>
+                <div class="tool-form-group">
+                    <label for="dosagePatientAgeInput">Patient Age (years):</label>
+                    <input type="number" id="dosagePatientAgeInput" placeholder="e.g., 35" min="0" step="any">
+                </div>
+                <div class="tool-form-group">
+                    <label for="dosageRenalFunctionInput">Renal Function (e.g., Normal, CrCl value, Description):</label>
+                    <input type="text" id="dosageRenalFunctionInput" placeholder="e.g., Normal, CrCl 45 mL/min">
+                </div>
+                 <div class="tool-form-group">
+                    <label for="dosageModelSelect">Select AI Model:</label>
+                    <select id="dosageModelSelect">
+                        <option value="gpt-4o">GPT-4o (Most Capable)</option>
+                        <option value="gpt-4o-mini">GPT-4o-mini (Balanced)</option>
+                        <option value="gpt-3.5-turbo">GPT-3.5-Turbo</option>
+                    </select>
+                </div>
+                <p id="dosageCalculatorStatusMessage" class="tool-status-message"></p>
+                <div id="dosageCalculatorLoadingIndicator" class="tool-loading-indicator" hidden>
+                    <div class="spinner" style="width:30px; height:30px; border-width:4px;"></div>
+                    <p>Calculating dosage information...</p>
+                </div>
+                <div class="tool-action-buttons">
+                    <button id="calculateDosageActualBtn">Get Dosage Info</button>
+                    <button id="returnToLandingViewBtn3" class="secondary">Back to Main Menu</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- VIEW 5: Dosage Result -->
+        <div id="dosageResultView" hidden>
+            <header class="view-header"><h2>Dosage Information (Experimental Tool)</h2></header>
+            <section class="view-section">
+                <p class="dosage-experimental-note" style="margin-top:0;">
+                     <strong>Note for Pharmacists:</strong> Review AI-generated information carefully. This is for experimental/educational use and does NOT replace professional judgment or official resources. Verify all details.
+                </p>
+                <div class="result-info-bar">
+                    <p><strong>Drug:</strong> <span id="resultDosageDrugName">N/A</span></p>
+                    <p><strong>Weight:</strong> <span id="resultDosageWeight">N/A</span> kg</p>
+                    <p><strong>Age:</strong> <span id="resultDosageAge">N/A</span> years</p>
+                    <p><strong>Renal Function:</strong> <span id="resultDosageRenal">N/A</span></p>
+                    <p><strong>Model Used:</strong> <span id="resultDosageModelUsed">N/A</span></p>
+                </div>
+                <div id="dosageDisplayArea" class="result-display-area">
+                    <p style="color: var(--secondary-color);">Loading dosage information...</p>
+                </div>
+                <div class="tool-action-buttons">
+                    <button id="calculateNewDosageBtn">Calculate New Dosage</button>
+                    <button id="returnToLandingViewBtn4" class="secondary">Back to Main Menu</button>
+                </div>
+            </section>
+        </div>
+        
+        <!-- VIEW 6: Drug Quizzer -->
+        <div id="drugQuizzerView" hidden>
+            <header class="view-header"><h2>Pharmacy Drug Quizzer</h2></header>
+            <section class="view-section">
+                <div class="tool-action-buttons" style="margin-bottom: 1.5rem;">
+                    <button id="newQuizQuestionBtn">New Question</button>
+                </div>
+                <div id="quizzerLoadingIndicator" class="tool-loading-indicator" hidden>
+                    <div class="spinner" style="width:30px; height:30px; border-width:4px;"></div>
+                    <p>Fetching new question...</p>
+                </div>
+                <p id="quizzerStatusMessage" class="tool-status-message"></p>
+
+                <h3>Question:</h3>
+                <div id="quizQuestionArea" class="result-display-area" style="background-color: var(--light-bg);">Click "New Question" to start.</div>
+                
+                <div class="tool-action-buttons" style="margin-top: 1rem;">
+                    <button id="showQuizAnswerBtn" disabled>Show Answer</button>
+                </div>
+
+                <h3 id="quizAnswerTitle" hidden style="margin-top: 1.5rem;">Answer:</h3>
+                <div id="quizAnswerArea" class="result-display-area" style="background-color: #e9f7ef; border-color: var(--success-color);" hidden></div>
+
+                <div class="tool-action-buttons" style="margin-top: 2rem;">
+                    <button id="returnToLandingViewBtn5" class="secondary">Back to Main Menu</button>
+                </div>
+            </section>
+        </div>
+
     </div> <!-- End of .app-container -->
 
-    <div id="customModalOverlay" class="modal-overlay">
+    <div id="customModalOverlay" class="modal-overlay"> 
       <div class="modal-content"> <p id="modalMessage">Are you sure?</p> <div class="modal-buttons"> <button id="modalConfirmBtn" class="danger">Confirm</button> <button id="modalCancelBtn" class="secondary">Cancel</button> </div> </div>
     </div>
 
@@ -321,7 +395,8 @@
     const DEFAULT_SYSTEM_PROMPT = `You are a hospital pharmacist analyzing a prescription image. Format your response strictly using Markdown: 1. Start with a heading: '### Detected Medications'. * Under this, use a bulleted list (*). For each drug, use the format: * DRUG{Drug Name} Dosage (e.g., * DRUG{Amoxicillin} 250mg three times daily). 2. Next heading: '### Interactions Found'. * Bulleted list of any drug-drug interactions identified. If none, state "No significant interactions found." For each interaction pair, use DRUG{} for each drug. e.g. * DRUG{Warfarin} and DRUG{Aspirin}. 3. Next heading: '### Consequences & Importance'. * For each interaction, explain its consequences and rate its importance/danger using IMPORTANCE{Severity} (e.g., IMPORTANCE{High}, IMPORTANCE{Medium}, IMPORTANCE{Low}). 4. Final heading: '### Recommendations'. * Provide clear, actionable recommendations. Your primary task is to clearly state the drugs and dosages, then identify and report interactions, their consequences, importance, and your recommendations. Keep it concise. If your view of the prescription is obstructed or unreadable, state this first under a heading '### Readability Issues'. Do not include disclaimers, refuse to answer, or suggest consulting external resources unless absolutely critical for immediate patient safety.`;
 
     let appApiKey = '';
-    let currentActiveView = 'landingView'; // Start with the landing view
+    let currentActiveView = 'landingView';
+    let currentQuizAnswer = ''; 
 
     // --- Utility Functions ---
     function sel(id){ return document.getElementById(id); }
@@ -329,23 +404,22 @@
     const hideEl = el => { if(el) el.hidden = true; };
 
     // --- View Switching Logic ---
-    const allViews = [sel('landingView'), sel('mainAppView'), sel('adviceGeneratorView'), sel('adviceResultView')];
+    const allViewIds = ['landingView', 'mainAppView', 'adviceGeneratorView', 'adviceResultView', 'dosageCalculatorView', 'dosageResultView', 'drugQuizzerView'];
+    const allViewElements = allViewIds.map(id => sel(id));
     function switchToView(viewId) {
-        allViews.forEach(view => { if(view) hideEl(view); });
+        allViewElements.forEach(view => { if(view) hideEl(view); });
         const viewToShow = sel(viewId);
         if (viewToShow) {
             showEl(viewToShow);
             currentActiveView = viewId;
             window.scrollTo(0, 0);
-             // If switching to mainAppView, ensure its internal state is reset or set appropriately
-            if (viewId === 'mainAppView' && !sel('resultSection').hidden) {
-                // If a result is showing, don't reset to capture, let user decide via restart button
-            } else if (viewId === 'mainAppView') {
-                 switchToMainAppSection('captureSection'); // Default to capture section
+            if (viewId === 'mainAppView' && (!sel('resultSection') || sel('resultSection').hidden)) {
+                 if (typeof switchToMainAppSection === 'function') switchToMainAppSection('captureSection');
             }
         } else {
             console.error("Attempted to switch to non-existent view:", viewId);
-            showEl(sel('landingView')); 
+            const landing = sel('landingView');
+            if (landing) showEl(landing); 
             currentActiveView = 'landingView';
         }
     }
@@ -354,110 +428,250 @@
     const apiKeyInput = sel('apiKeyInput'), saveApiKeyBtn = sel('saveApiKeyBtn'),
           testApiKeyBtn = sel('testApiKeyBtn'), clearApiKeyBtn = sel('clearApiKeyBtn'),
           apiKeyStatus = sel('apiKeyStatus');
-
-    function updateStatusWithMessage(element, message, type = 'info', duration = 4000) { /* ... same as before ... */ if (!element) return; element.textContent = message; element.className = type; if (message && duration > 0) { setTimeout(() => { if (element.textContent === message) { element.textContent = ''; element.className = 'info';}}, duration); } }
+    function updateStatusWithMessage(element, message, type = 'info', duration = 4000) { if (!element) return; element.textContent = message; element.className = type; if (message && duration > 0) { setTimeout(() => { if (element.textContent === message) { element.textContent = ''; element.className = 'info';}}, duration); } }
     function updateApiKeyDisplayStatus(message, type = 'info') { updateStatusWithMessage(apiKeyStatus, message, type); }
-    function loadApiKeyFromStorage() { /* ... same as before ... */ const k=localStorage.getItem(API_KEY_STORAGE_ITEM); if(k){apiKeyInput.value=k;appApiKey=k;updateApiKeyDisplayStatus('API Key loaded.','info');}else{updateApiKeyDisplayStatus('Please enter API Key.','info');} }
-    if(saveApiKeyBtn) saveApiKeyBtn.onclick = () => { /* ... same as before ... */ const k=apiKeyInput.value.trim();if(k&&k.startsWith('sk-')){localStorage.setItem(API_KEY_STORAGE_ITEM,k);appApiKey=k;updateApiKeyDisplayStatus('API Key saved!','success');}else{updateApiKeyDisplayStatus(k?'Invalid Key format.':'Key cannot be empty.','error');} };
-    if(testApiKeyBtn) testApiKeyBtn.onclick = async () => { /* ... same as before ... */ const k=apiKeyInput.value.trim();if(!k){updateApiKeyDisplayStatus('Enter key to test.','error');return;} updateApiKeyDisplayStatus('Testing...','info');try{const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':`Bearer ${k}`}});if(r.ok){updateApiKeyDisplayStatus('Key valid!','success');if(k!==appApiKey){localStorage.setItem(API_KEY_STORAGE_ITEM,k);appApiKey=k;}}else{const e=await r.json();updateApiKeyDisplayStatus(`Test failed: ${e.error?.message||r.statusText}`,'error');}}catch(e){console.error("API Key Test Error:", e); updateApiKeyDisplayStatus('Test failed: Network error.','error');} };
-    if(clearApiKeyBtn) clearApiKeyBtn.onclick = () => { /* ... same as before ... */ localStorage.removeItem(API_KEY_STORAGE_ITEM);apiKeyInput.value='';appApiKey='';updateApiKeyDisplayStatus('API Key cleared.','info'); };
+    function loadApiKeyFromStorage() { const k=localStorage.getItem(API_KEY_STORAGE_ITEM); if(k){apiKeyInput.value=k;appApiKey=k;updateApiKeyDisplayStatus('API Key loaded.','info');}else{updateApiKeyDisplayStatus('Please enter API Key.','info');} }
+    if(saveApiKeyBtn) saveApiKeyBtn.onclick = () => { const k=apiKeyInput.value.trim();if(k&&k.startsWith('sk-')){localStorage.setItem(API_KEY_STORAGE_ITEM,k);appApiKey=k;updateApiKeyDisplayStatus('API Key saved!','success');}else{updateApiKeyDisplayStatus(k?'Invalid Key format.':'Key cannot be empty.','error');} };
+    if(testApiKeyBtn) testApiKeyBtn.onclick = async () => { const k=apiKeyInput.value.trim();if(!k){updateApiKeyDisplayStatus('Enter key to test.','error');return;} updateApiKeyDisplayStatus('Testing...','info');try{const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':`Bearer ${k}`}});if(r.ok){updateApiKeyDisplayStatus('Key valid!','success');if(k!==appApiKey){localStorage.setItem(API_KEY_STORAGE_ITEM,k);appApiKey=k;}}else{const e=await r.json();updateApiKeyDisplayStatus(`Test failed: ${e.error?.message||r.statusText}`,'error');}}catch(e){console.error("API Key Test Error:", e); updateApiKeyDisplayStatus('Test failed: Network error.','error');} };
+    if(clearApiKeyBtn) clearApiKeyBtn.onclick = () => { localStorage.removeItem(API_KEY_STORAGE_ITEM);apiKeyInput.value='';appApiKey='';updateApiKeyDisplayStatus('API Key cleared.','info'); };
 
     // --- LANDING VIEW Logic ---
     const goToMainAppViewBtn = sel('goToMainAppViewBtn');
     const goToAdviceGeneratorFromLandingBtn = sel('goToAdviceGeneratorFromLandingBtn');
+    const goToDosageCalculatorFromLandingBtn = sel('goToDosageCalculatorFromLandingBtn');
+    const goToDrugQuizzerFromLandingBtn = sel('goToDrugQuizzerFromLandingBtn'); 
 
-    if(goToMainAppViewBtn) goToMainAppViewBtn.onclick = () => {
-        switchToView('mainAppView');
-        // switchToMainAppSection('captureSection'); // This is now handled in switchToView
-    };
+    if(goToMainAppViewBtn) goToMainAppViewBtn.onclick = () => switchToView('mainAppView');
     if(goToAdviceGeneratorFromLandingBtn) goToAdviceGeneratorFromLandingBtn.onclick = () => switchToView('adviceGeneratorView');
-
+    if(goToDosageCalculatorFromLandingBtn) goToDosageCalculatorFromLandingBtn.onclick = () => switchToView('dosageCalculatorView');
+    if(goToDrugQuizzerFromLandingBtn) goToDrugQuizzerFromLandingBtn.onclick = () => {
+        switchToView('drugQuizzerView');
+        const quizQArea = sel('quizQuestionArea');
+        if (quizQArea && quizQArea.textContent === 'Click "New Question" to start.') {
+             if (typeof fetchNewQuizQuestion === 'function') fetchNewQuizQuestion();
+        }
+    };
 
     // --- MAIN APP VIEW (Interaction Finder) Logic ---
-    const takePhotoBtn=sel('takePhotoBtn'), fileInput=sel('fileInput'), /* ... all other main app selectors ... */
+    const takePhotoBtn=sel('takePhotoBtn'), fileInputIF=sel('fileInputIF'), 
           previewImg =sel('previewImg'), usePhotoBtn=sel('usePhotoBtn'), retakeBtn=sel('retakeBtn'),
-          modelSelectIF=sel('modelSelect'), // Renamed to avoid conflict if another modelSelect exists
+          modelSelectIF=sel('modelSelectIF'), 
           loadingSec = sel('loadingSection'), responseBox=sel('responseBox'), restartBtn=sel('restartBtn'),
           copyResultsBtn = sel('copyResultsBtn'), historyCarousel=sel('historyCarousel'),
           noHistoryMessage=sel('noHistoryMessage'), historySectionElement=sel('historySection'),
           historyCarouselContainer=sel('historyCarouselContainer'), clearAllHistoryBtn=sel('clearAllHistoryBtn'),
-          customModalOverlay=sel('customModalOverlay'), modalMessage=sel('modalMessage'),
-          modalConfirmBtn=sel('modalConfirmBtn'), modalCancelBtn=sel('modalCancelBtn'),
+          customModalOverlayIF=sel('customModalOverlay'), modalMessageIF=sel('modalMessage'), // Suffixed to avoid conflict if other modals exist
+          modalConfirmBtnIF=sel('modalConfirmBtn'), modalCancelBtnIF=sel('modalCancelBtn'),
           goToPromptCustomizationBtn=sel('goToPromptCustomizationBtn'),
           promptCustomizationBtnContainer=sel('promptCustomizationBtnContainer'),
           promptSectionElement=sel('promptSection'), promptEditor=sel('promptEditor'),
           savePromptBtn=sel('savePromptBtn'), resetPromptBtn=sel('resetPromptBtn'),
-          returnToMainFromPromptBtn=sel('returnToMainFromPromptBtn'), promptStatus=sel('promptStatus'),
+          returnToMainFromPromptBtn=sel('returnToMainFromPromptBtn'), promptStatusIF=sel('promptStatusIF'), 
           patientInfoGeneratorBtnExternal = sel('patientInfoGeneratorBtnExternal'),
           backToLandingViewFromMainBtn = sel('backToLandingViewFromMainBtn');
     
-    let base64Image=''; let analysisHistory = []; let currentSystemPrompt = DEFAULT_SYSTEM_PROMPT; let currentConfirmCallback = null;
-    const allMainAppPageElementsToToggle = sel('mainAppView') ? Array.from(sel('mainAppView').querySelector('.page-container').querySelectorAll('section, div#promptCustomizationBtnContainer')) : [];
+    let base64ImageIF=''; let analysisHistoryIF = []; let currentSystemPromptIF = DEFAULT_SYSTEM_PROMPT; let currentConfirmCallbackIF = null;
+    const allMainAppPageElementsToToggle = sel('mainAppView') && sel('mainAppView').querySelector('.page-container') ? Array.from(sel('mainAppView').querySelector('.page-container').querySelectorAll('section, div#promptCustomizationBtnContainer')) : [];
 
-    function switchToMainAppSection(targetSectionId){ /* ... same as before ... */ if(!sel('mainAppView')) return; allMainAppPageElementsToToggle.forEach(el => hideEl(el)); const sectionToShow = sel(targetSectionId); if (sectionToShow) showEl(sectionToShow); if (targetSectionId === 'captureSection') { showEl(historySectionElement); showEl(promptCustomizationBtnContainer); if (analysisHistory.length > 0) { hideEl(noHistoryMessage); showEl(historyCarouselContainer); showEl(clearAllHistoryBtn); } else { showEl(noHistoryMessage); hideEl(historyCarouselContainer); hideEl(clearAllHistoryBtn); } } }
-    function updatePromptStatus(message, type = 'info') { updateStatusWithMessage(promptStatus, message, type); }
-    function showCustomConfirm(message, onConfirm) { /* ... same as before ... */ if(!modalMessage || !customModalOverlay) return; modalMessage.textContent = message; currentConfirmCallback = onConfirm; customModalOverlay.classList.add('active'); }
-    function hideCustomConfirm() { /* ... same as before ... */ if(!customModalOverlay) return; customModalOverlay.classList.remove('active'); currentConfirmCallback = null; }
-    if(modalConfirmBtn) modalConfirmBtn.onclick = () => { if (currentConfirmCallback) currentConfirmCallback(); hideCustomConfirm(); };
-    if(modalCancelBtn) modalCancelBtn.onclick = hideCustomConfirm;
-    if(customModalOverlay) customModalOverlay.onclick = (e) => { if (e.target === customModalOverlay) hideCustomConfirm(); };
-    function loadHistory() { /* ... same as before ... */ const storedHistory = localStorage.getItem(HISTORY_STORAGE_KEY); try { analysisHistory = storedHistory ? JSON.parse(storedHistory) : []; } catch (e) { analysisHistory = []; localStorage.removeItem(HISTORY_STORAGE_KEY); } renderHistoryCarousel(); }
-    function saveAnalysisToHistory(imgBase64, respHtml, model) { /* ... same as before ... */ const newItem = { id: Date.now(), imageBase64: imgBase64, responseHtml: respHtml, modelUsed: model, timestamp: Date.now() }; analysisHistory.unshift(newItem); if (analysisHistory.length > MAX_HISTORY_ITEMS) analysisHistory.length = MAX_HISTORY_ITEMS; localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(analysisHistory)); renderHistoryCarousel(); }
-    function deleteHistoryItem(itemId) { /* ... same as before ... */ showCustomConfirm('Delete this analysis from history?', () => { analysisHistory = analysisHistory.filter(item => item.id !== itemId); localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(analysisHistory)); renderHistoryCarousel(); }); }
-    if(clearAllHistoryBtn) clearAllHistoryBtn.onclick = () => { /* ... same as before ... */ showCustomConfirm('Clear all recent analyses? This cannot be undone.', () => { analysisHistory = []; localStorage.removeItem(HISTORY_STORAGE_KEY); renderHistoryCarousel(); }); };
-    function renderHistoryCarousel() { /* ... same as before, ensure all elements exist ... */ if(!historyCarousel || !noHistoryMessage || !historyCarouselContainer || !clearAllHistoryBtn) return; historyCarousel.innerHTML = ''; if (analysisHistory.length === 0) { showEl(noHistoryMessage); hideEl(historyCarouselContainer); hideEl(clearAllHistoryBtn); } else { hideEl(noHistoryMessage); showEl(historyCarouselContainer); showEl(clearAllHistoryBtn); analysisHistory.forEach(item => { const w = document.createElement('div'); w.className = 'history-item-wrapper'; const iDiv = document.createElement('div'); iDiv.className = 'history-item'; iDiv.onclick = () => loadAnalysisFromHistoryItem(item); const img = document.createElement('img'); img.src = `data:image/jpeg;base64,${item.imageBase64}`; img.alt = `Analyzed ${new Date(item.timestamp).toLocaleDateString()}`; iDiv.appendChild(img); const del = document.createElement('button'); del.className = 'delete-history-item-btn'; del.innerHTML = '×'; del.title = 'Delete'; del.onclick = (e) => { e.stopPropagation(); deleteHistoryItem(item.id); }; iDiv.appendChild(del); const date = document.createElement('span'); date.className = 'history-item-date'; const d=new Date(item.timestamp); date.textContent = `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; w.appendChild(iDiv); w.appendChild(date); historyCarousel.appendChild(w); });}}
-    function loadAnalysisFromHistoryItem(item) { /* ... same as before ... */ if(item && responseBox){ responseBox.innerHTML=item.responseHtml; switchToMainAppSection('resultSection'); } }
-    function loadCustomPrompt() { /* ... same as before ... */ const sp = localStorage.getItem(CUSTOM_PROMPT_STORAGE_KEY); currentSystemPrompt = sp ? sp : DEFAULT_SYSTEM_PROMPT; if(promptEditor) promptEditor.value = currentSystemPrompt; if(sp && promptStatus) updatePromptStatus('Custom prompt loaded.','info', 2000); }
-    if(goToPromptCustomizationBtn) goToPromptCustomizationBtn.onclick = () => { if(promptEditor) promptEditor.value = currentSystemPrompt; switchToMainAppSection('promptSection'); };
-    if(savePromptBtn) savePromptBtn.onclick = () => { /* ... same as before ... */ const np = promptEditor.value.trim(); if (np) { currentSystemPrompt = np; localStorage.setItem(CUSTOM_PROMPT_STORAGE_KEY, np); updatePromptStatus('Prompt saved successfully!', 'success'); } else { updatePromptStatus('Prompt cannot be empty. Reverted.', 'error'); promptEditor.value = currentSystemPrompt; }};
-    if(resetPromptBtn) resetPromptBtn.onclick = () => { /* ... same as before ... */ showCustomConfirm("Reset prompt to default?", () => { currentSystemPrompt = DEFAULT_SYSTEM_PROMPT; promptEditor.value = DEFAULT_SYSTEM_PROMPT; localStorage.removeItem(CUSTOM_PROMPT_STORAGE_KEY); updatePromptStatus('Prompt reset to default.', 'info'); }); };
+    function switchToMainAppSection(targetSectionId){ 
+        if(!sel('mainAppView') || !allMainAppPageElementsToToggle.length) return; 
+        allMainAppPageElementsToToggle.forEach(el => { if(el) hideEl(el); }); 
+        const sectionToShow = sel(targetSectionId); 
+        if (sectionToShow) showEl(sectionToShow); 
+        if (targetSectionId === 'captureSection') { 
+            if(historySectionElement) showEl(historySectionElement); 
+            if(promptCustomizationBtnContainer) showEl(promptCustomizationBtnContainer); 
+            if (analysisHistoryIF.length > 0) { 
+                if(noHistoryMessage) hideEl(noHistoryMessage); 
+                if(historyCarouselContainer) showEl(historyCarouselContainer); 
+                if(clearAllHistoryBtn) showEl(clearAllHistoryBtn); 
+            } else { 
+                if(noHistoryMessage) showEl(noHistoryMessage); 
+                if(historyCarouselContainer) hideEl(historyCarouselContainer); 
+                if(clearAllHistoryBtn) hideEl(clearAllHistoryBtn); 
+            } 
+        } 
+    }
+    function updatePromptStatusDisplay(message, type = 'info') { updateStatusWithMessage(promptStatusIF, message, type); } 
+    function showCustomConfirmIF(message, onConfirm) { if(!modalMessageIF || !customModalOverlayIF) return; modalMessageIF.textContent = message; currentConfirmCallbackIF = onConfirm; customModalOverlayIF.classList.add('active'); }
+    function hideCustomConfirmIF() { if(!customModalOverlayIF) return; customModalOverlayIF.classList.remove('active'); currentConfirmCallbackIF = null; }
+    if(modalConfirmBtnIF) modalConfirmBtnIF.onclick = () => { if (currentConfirmCallbackIF) currentConfirmCallbackIF(); hideCustomConfirmIF(); };
+    if(modalCancelBtnIF) modalCancelBtnIF.onclick = hideCustomConfirmIF;
+    if(customModalOverlayIF) customModalOverlayIF.onclick = (e) => { if (e.target === customModalOverlayIF) hideCustomConfirmIF(); };
+    function loadHistoryIF() { const storedHistory = localStorage.getItem(HISTORY_STORAGE_KEY); try { analysisHistoryIF = storedHistory ? JSON.parse(storedHistory) : []; } catch (e) { analysisHistoryIF = []; localStorage.removeItem(HISTORY_STORAGE_KEY); } renderHistoryCarouselIF(); }
+    function saveAnalysisToHistoryIF(imgBase64, respHtml, model) { const newItem = { id: Date.now(), imageBase64: imgBase64, responseHtml: respHtml, modelUsed: model, timestamp: Date.now() }; analysisHistoryIF.unshift(newItem); if (analysisHistoryIF.length > MAX_HISTORY_ITEMS) analysisHistoryIF.length = MAX_HISTORY_ITEMS; localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(analysisHistoryIF)); renderHistoryCarouselIF(); }
+    function deleteHistoryItemIF(itemId) { showCustomConfirmIF('Delete this analysis from history?', () => { analysisHistoryIF = analysisHistoryIF.filter(item => item.id !== itemId); localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(analysisHistoryIF)); renderHistoryCarouselIF(); }); }
+    if(clearAllHistoryBtn) clearAllHistoryBtn.onclick = () => { showCustomConfirmIF('Clear all recent analyses? This cannot be undone.', () => { analysisHistoryIF = []; localStorage.removeItem(HISTORY_STORAGE_KEY); renderHistoryCarouselIF(); }); };
+    function renderHistoryCarouselIF() { if(!historyCarousel || !noHistoryMessage || !historyCarouselContainer || !clearAllHistoryBtn) return; historyCarousel.innerHTML = ''; if (analysisHistoryIF.length === 0) { showEl(noHistoryMessage); hideEl(historyCarouselContainer); hideEl(clearAllHistoryBtn); } else { hideEl(noHistoryMessage); showEl(historyCarouselContainer); showEl(clearAllHistoryBtn); analysisHistoryIF.forEach(item => { const w = document.createElement('div'); w.className = 'history-item-wrapper'; const iDiv = document.createElement('div'); iDiv.className = 'history-item'; iDiv.onclick = () => loadAnalysisFromHistoryItemIF(item); const img = document.createElement('img'); img.src = `data:image/jpeg;base64,${item.imageBase64}`; img.alt = `Analyzed ${new Date(item.timestamp).toLocaleDateString()}`; iDiv.appendChild(img); const del = document.createElement('button'); del.className = 'delete-history-item-btn'; del.innerHTML = '×'; del.title = 'Delete'; del.onclick = (e) => { e.stopPropagation(); deleteHistoryItemIF(item.id); }; iDiv.appendChild(del); const date = document.createElement('span'); date.className = 'history-item-date'; const d=new Date(item.timestamp); date.textContent = `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; w.appendChild(iDiv); w.appendChild(date); historyCarousel.appendChild(w); });}}
+    function loadAnalysisFromHistoryItemIF(item) { if(item && responseBox){ responseBox.innerHTML=item.responseHtml; switchToMainAppSection('resultSection'); } }
+    function loadCustomPromptIF() { const sp = localStorage.getItem(CUSTOM_PROMPT_STORAGE_KEY); currentSystemPromptIF = sp ? sp : DEFAULT_SYSTEM_PROMPT; if(promptEditor) promptEditor.value = currentSystemPromptIF; if(sp && promptStatusIF) updatePromptStatusDisplay('Custom prompt loaded.','info', 2000); }
+    if(goToPromptCustomizationBtn) goToPromptCustomizationBtn.onclick = () => { if(promptEditor) promptEditor.value = currentSystemPromptIF; switchToMainAppSection('promptSection'); };
+    if(savePromptBtn) savePromptBtn.onclick = () => { const np = promptEditor.value.trim(); if (np) { currentSystemPromptIF = np; localStorage.setItem(CUSTOM_PROMPT_STORAGE_KEY, np); updatePromptStatusDisplay('Prompt saved successfully!', 'success'); } else { updatePromptStatusDisplay('Prompt cannot be empty. Reverted.', 'error'); promptEditor.value = currentSystemPromptIF; }};
+    if(resetPromptBtn) resetPromptBtn.onclick = () => { showCustomConfirmIF("Reset prompt to default?", () => { currentSystemPromptIF = DEFAULT_SYSTEM_PROMPT; promptEditor.value = DEFAULT_SYSTEM_PROMPT; localStorage.removeItem(CUSTOM_PROMPT_STORAGE_KEY); updatePromptStatusDisplay('Prompt reset to default.', 'info'); }); };
     if(returnToMainFromPromptBtn) returnToMainFromPromptBtn.onclick = () => switchToMainAppSection('captureSection');
-    if(takePhotoBtn) takePhotoBtn.onclick =()=>fileInput.click();
-    if(retakeBtn) retakeBtn.onclick    =()=>fileInput.click();
-    if(fileInput) fileInput.onchange   = async () => { /* ... same as before ... */ const f=fileInput.files[0];if(!f)return;try{base64Image=await toBase64(f);previewImg.src='data:image/jpeg;base64,'+base64Image;switchToMainAppSection('previewSection');}catch(e){console.error("File error:",e);alert("Could not load image.");}};
-    if(usePhotoBtn) usePhotoBtn.onclick=()=>analyzeImage();
-    if(restartBtn) restartBtn.onclick=()=> { /* ... same as before ... */ if(responseBox) responseBox.innerHTML='';if(fileInput) fileInput.value='';base64Image='';if(previewImg) previewImg.src='';if(modelSelectIF) modelSelectIF.value='gpt-4o-mini';switchToMainAppSection('captureSection');}; // Use modelSelectIF
-    if(copyResultsBtn) copyResultsBtn.onclick = () => { /* ... same as before ... */ const t=responseBox.textContent;if(navigator.clipboard&&t){navigator.clipboard.writeText(t).then(()=>updateApiKeyDisplayStatus('Results copied!','success', 2000)).catch(e=>updateApiKeyDisplayStatus('Failed to copy.','error', 2000));}};
-    function markdownToHtml(mdText) { /* ... same as before ... */ let h = mdText.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>'); h = h.replace(/DRUG\{(.*?)\}/gim, '<span class="highlight-drug">$1</span>'); h = h.replace(/IMPORTANCE\{(High|Medium|Low)\}/gim, (m,s)=>`<span class="highlight-importance-${s.toLowerCase()}">${s}</span>`); h = h.replace(/^### (.*$)/gim, '<h3><span class="section-title-text">$1</span></h3>'); h = h.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>').replace(/__(.*?)__/gim, '<strong>$1</strong>'); h = h.replace(/\*(.*?)\*/gim, '<em>$1</em>').replace(/_(.*?)_/gim, '<em>$1</em>'); let iL=false; h=h.split('\n').map(l=>{const tL=l.trim();if(tL.match(/^[\*\-]\s+/)){let liC=tL.substring(tL.indexOf(' ')+1).trim();let li=`<li>${liC}</li>`;if(!iL){iL=true;return `<ul>${li}`;}return li;}else{let lR=l;if(iL){lR=`</ul>${lR}`;iL=false;}const tNL=lR.trim();if(tNL&&!tNL.startsWith('<h3')&&!tNL.startsWith('<ul>')&&!tNL.endsWith('</ul>')&&!tNL.startsWith('<p>')&&!tNL.endsWith('</p>')){return `<p>${tNL}</p>`;}return lR;}}).join('\n');if(iL)h+='</ul>';h=h.replace(/<\/ul>\s*<p>/gim,'</ul><p>').replace(/<p>\s*<\/p>/gim,'').replace(/\n\s*\n/g,'\n');return h.trim();}
-    function addCopySectionButtonsToResponseBox() { /* ... same as before ... */ if(!responseBox) return; const hs=responseBox.querySelectorAll('h3');hs.forEach(hE=>{let tS=hE.querySelector('.section-title-text');if(!tS){const tT=hE.textContent;hE.innerHTML='';tS=document.createElement('span');tS.className='section-title-text';tS.textContent=tT;hE.appendChild(tS);}if(hE.querySelector('.copy-section-btn'))return; const cB=document.createElement('button');cB.className='copy-section-btn';cB.textContent='Copy';cB.title=`Copy "${tS.textContent}" section`;hE.appendChild(cB);});}
-    if(responseBox) responseBox.addEventListener('click', function(event) { /* ... same as before ... */ if(event.target.classList.contains('copy-section-btn')){const hE=event.target.closest('h3');if(!hE)return;let cTC=hE.querySelector('.section-title-text').textContent+'\n';let nE=hE.nextElementSibling;while(nE&&nE.tagName!=='H3'){if(nE.tagName==='UL'){Array.from(nE.querySelectorAll('li')).forEach(li=>{cTC+=`• ${li.textContent.trim()}\n`;});}else{cTC+=nE.textContent.trim()+'\n';}nE=nE.nextElementSibling;}if(navigator.clipboard){navigator.clipboard.writeText(cTC.trim()).then(()=>updateApiKeyDisplayStatus('Section copied!','success',2000)).catch(err=>updateApiKeyDisplayStatus('Failed to copy.','error',2000));}}});
-    async function analyzeImage(){ /* ... same as before, ensure modelSelectIF is used ... */ if(!appApiKey){updateApiKeyDisplayStatus('API Key required.','error');apiKeyInput.focus();if(loadingSec && !loadingSec.hidden)switchToMainAppSection('previewSection');if(responseBox) responseBox.innerHTML='<p style="color:var(--danger-color);">API Key missing.</p>';return;} if(responseBox) responseBox.innerHTML='';switchToMainAppSection('loadingSection'); const sM=modelSelectIF.value; const body={model:sM,messages:[{role:'user',content:[{type:'text',text:currentSystemPrompt},{type:'image_url',image_url:{url:'data:image/jpeg;base64,'+base64Image}}]}],max_tokens:2000}; try{ const rs=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+appApiKey},body:JSON.stringify(body)}); const d=await rs.json(); if(rs.ok&&d.choices?.[0]?.message?.content){ const rm=d.choices[0].message.content.trim(); const hr=markdownToHtml(rm); responseBox.innerHTML=hr; addCopySectionButtonsToResponseBox(); saveAnalysisToHistory(base64Image, responseBox.innerHTML, sM); }else{ const em=d.error?`${d.error.message} (Code: ${d.error.code})`:'Unknown API error.'; responseBox.innerHTML=`<p style="color:var(--danger-color);">Error: ${em}</p>`; if(d.error?.code==='invalid_api_key'||d.error?.type==='auth_error'){updateApiKeyDisplayStatus('Invalid API Key.','error');appApiKey='';localStorage.removeItem(API_KEY_STORAGE_ITEM);apiKeyInput.value='';}}}catch(e){if(responseBox) responseBox.innerHTML='<p style="color:var(--danger-color);">Request failed. Check network.</p>';} finally{switchToMainAppSection('resultSection');}}
-    function toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
+    if(takePhotoBtn) takePhotoBtn.onclick =()=> { if(fileInputIF) fileInputIF.click(); };
+    if(retakeBtn) retakeBtn.onclick =()=> { if(fileInputIF) fileInputIF.click(); };
+    if(fileInputIF) fileInputIF.onchange = async () => { const f=fileInputIF.files[0];if(!f)return;try{base64ImageIF=await toBase64IF(f);if(previewImg) previewImg.src='data:image/jpeg;base64,'+base64ImageIF;switchToMainAppSection('previewSection');}catch(e){console.error("File error:",e);alert("Could not load image.");}};
+    if(usePhotoBtn) usePhotoBtn.onclick=()=>analyzeImageIF();
+    if(restartBtn) restartBtn.onclick=()=> { if(responseBox) responseBox.innerHTML='';if(fileInputIF) fileInputIF.value='';base64ImageIF='';if(previewImg) previewImg.src='';if(modelSelectIF) modelSelectIF.value='gpt-4o-mini';switchToMainAppSection('captureSection');};
+    if(copyResultsBtn) copyResultsBtn.onclick = () => { const t=responseBox.textContent;if(navigator.clipboard&&t){navigator.clipboard.writeText(t).then(()=>updateApiKeyDisplayStatus('Results copied!','success', 2000)).catch(e=>updateApiKeyDisplayStatus('Failed to copy.','error', 2000));}};
+    function markdownToHtmlIF(mdText) { let h = mdText.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>'); h = h.replace(/DRUG\{(.*?)\}/gim, '<span class="highlight-drug">$1</span>'); h = h.replace(/IMPORTANCE\{(High|Medium|Low)\}/gim, (m,s)=>`<span class="highlight-importance-${s.toLowerCase()}">${s}</span>`); h = h.replace(/^### (.*$)/gim, '<h3><span class="section-title-text">$1</span></h3>'); h = h.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>').replace(/__(.*?)__/gim, '<strong>$1</strong>'); h = h.replace(/\*(.*?)\*/gim, '<em>$1</em>').replace(/_(.*?)_/gim, '<em>$1</em>'); let iL=false; h=h.split('\n').map(l=>{const tL=l.trim();if(tL.match(/^[\*\-]\s+/)){let liC=tL.substring(tL.indexOf(' ')+1).trim();let li=`<li>${liC}</li>`;if(!iL){iL=true;return `<ul>${li}`;}return li;}else{let lR=l;if(iL){lR=`</ul>${lR}`;iL=false;}const tNL=lR.trim();if(tNL&&!tNL.startsWith('<h3')&&!tNL.startsWith('<ul>')&&!tNL.endsWith('</ul>')&&!tNL.startsWith('<p>')&&!tNL.endsWith('</p>')){return `<p>${tNL}</p>`;}return lR;}}).join('\n');if(iL)h+='</ul>';h=h.replace(/<\/ul>\s*<p>/gim,'</ul><p>').replace(/<p>\s*<\/p>/gim,'').replace(/\n\s*\n/g,'\n');return h.trim();}
+    function addCopySectionButtonsToResponseBoxIF() { if(!responseBox) return; const hs=responseBox.querySelectorAll('h3');hs.forEach(hE=>{let tS=hE.querySelector('.section-title-text');if(!tS){const tT=hE.textContent;hE.innerHTML='';tS=document.createElement('span');tS.className='section-title-text';tS.textContent=tT;hE.appendChild(tS);}if(hE.querySelector('.copy-section-btn'))return; const cB=document.createElement('button');cB.className='copy-section-btn';cB.textContent='Copy';cB.title=`Copy "${tS.textContent}" section`;hE.appendChild(cB);});}
+    if(responseBox) responseBox.addEventListener('click', function(event) { if(event.target.classList.contains('copy-section-btn')){const hE=event.target.closest('h3');if(!hE)return;let cTC=hE.querySelector('.section-title-text').textContent+'\n';let nE=hE.nextElementSibling;while(nE&&nE.tagName!=='H3'){if(nE.tagName==='UL'){Array.from(nE.querySelectorAll('li')).forEach(li=>{cTC+=`• ${li.textContent.trim()}\n`;});}else{cTC+=nE.textContent.trim()+'\n';}nE=nE.nextElementSibling;}if(navigator.clipboard){navigator.clipboard.writeText(cTC.trim()).then(()=>updateApiKeyDisplayStatus('Section copied!','success',2000)).catch(err=>updateApiKeyDisplayStatus('Failed to copy.','error',2000));}}});
+    async function analyzeImageIF(){ if(!appApiKey){updateApiKeyDisplayStatus('API Key required.','error');apiKeyInput.focus();if(loadingSec && !loadingSec.hidden)switchToMainAppSection('previewSection');if(responseBox) responseBox.innerHTML='<p style="color:var(--danger-color);">API Key missing.</p>';return;} if(responseBox) responseBox.innerHTML='';switchToMainAppSection('loadingSection'); const sM=modelSelectIF.value; const body={model:sM,messages:[{role:'user',content:[{type:'text',text:currentSystemPromptIF},{type:'image_url',image_url:{url:'data:image/jpeg;base64,'+base64ImageIF}}]}],max_tokens:2000}; try{ const rs=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+appApiKey},body:JSON.stringify(body)}); const d=await rs.json(); if(rs.ok&&d.choices?.[0]?.message?.content){ const rm=d.choices[0].message.content.trim(); const hr=markdownToHtmlIF(rm); responseBox.innerHTML=hr; addCopySectionButtonsToResponseBoxIF(); saveAnalysisToHistoryIF(base64ImageIF, responseBox.innerHTML, sM); }else{ const em=d.error?`${d.error.message} (Code: ${d.error.code})`:'Unknown API error.'; responseBox.innerHTML=`<p style="color:var(--danger-color);">Error: ${em}</p>`; if(d.error?.code==='invalid_api_key'||d.error?.type==='auth_error'){updateApiKeyDisplayStatus('Invalid API Key.','error');appApiKey='';localStorage.removeItem(API_KEY_STORAGE_ITEM);apiKeyInput.value='';}}}catch(e){if(responseBox) responseBox.innerHTML='<p style="color:var(--danger-color);">Request failed. Check network.</p>';} finally{switchToMainAppSection('resultSection');}}
+    function toBase64IF(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
     if(patientInfoGeneratorBtnExternal) patientInfoGeneratorBtnExternal.onclick = () => { window.open('info.html', '_blank'); };
     if(backToLandingViewFromMainBtn) backToLandingViewFromMainBtn.onclick = () => switchToView('landingView');
 
     // --- ADVICE GENERATOR VIEW Logic ---
-    const adviceDrugNameInput = sel('adviceDrugNameInput');
-    const adviceModelSelect = sel('adviceModelSelect'); // This ID is unique to this view now
-    const generateAdviceActualBtn = sel('generateAdviceActualBtn');
-    const returnToLandingViewBtn1 = sel('returnToLandingViewBtn1');
-    const adviceGeneratorStatusMessage = sel('adviceGeneratorStatusMessage');
-    const adviceGeneratorLoadingIndicator = sel('adviceGeneratorLoadingIndicator');
-
+    const adviceDrugNameInput = sel('adviceDrugNameInput'); const adviceModelSelect = sel('adviceModelSelect'); 
+    const generateAdviceActualBtn = sel('generateAdviceActualBtn'); const returnToLandingViewBtn1 = sel('returnToLandingViewBtn1');
+    const adviceGeneratorStatusMessage = sel('adviceGeneratorStatusMessage'); const adviceGeneratorLoadingIndicator = sel('adviceGeneratorLoadingIndicator');
     if(adviceModelSelect) adviceModelSelect.value = 'gpt-4o-mini';
-
-    function updateAdviceGeneratorStatus(message, isError = false, duration = 5000) { /* ... same as before ... */ if (!adviceGeneratorStatusMessage) return; adviceGeneratorStatusMessage.textContent = message; adviceGeneratorStatusMessage.style.color = isError ? 'var(--danger-color)' : 'var(--success-color)'; if (!isError && message && !message.toLowerCase().includes('error') && !message.toLowerCase().includes('valid')) { adviceGeneratorStatusMessage.style.color = 'var(--secondary-color)'; } if (message && duration > 0) { setTimeout(() => { if (adviceGeneratorStatusMessage.textContent === message) adviceGeneratorStatusMessage.textContent = ''; }, duration); } }
-    if(generateAdviceActualBtn) generateAdviceActualBtn.onclick = async () => { /* ... same as before, but use adviceModelSelect ... */ const drugName = adviceDrugNameInput.value.trim(); const selectedModelDisplay = adviceModelSelect.value; if (!appApiKey) { updateAdviceGeneratorStatus('API Key is missing. Configure it at the top.', true); apiKeyInput.focus(); return; } if (!drugName) { updateAdviceGeneratorStatus('Please enter a drug name.', true); adviceDrugNameInput.focus(); return; } updateAdviceGeneratorStatus(''); hideEl(adviceGeneratorStatusMessage); showEl(adviceGeneratorLoadingIndicator); generateAdviceActualBtn.disabled = true; if(returnToLandingViewBtn1) returnToLandingViewBtn1.disabled = true; let modelForAPI; switch (selectedModelDisplay) { case 'gpt-3.5-turbo': modelForAPI = 'gpt-3.5-turbo'; break; case 'gpt-4o-mini': modelForAPI = 'gpt-4o-mini'; break; case 'gpt-4o': modelForAPI = 'gpt-4o'; break; default: modelForAPI = 'gpt-4o-mini'; } const userPrompt = `Generate a patient-friendly explanation about <span class="highlight-drugname">${drugName}</span>. Your task is to clearly inform someone who has never taken this medication about: - What <span class="highlight-drugname">${drugName}</span> is and why it is prescribed. - How to correctly take it (including dosage, timing, or any instructions). - Important <span class="highlight-term">medical terms</span> and the mechanism of action, if relevant. - Expected <span class="highlight-benefit">benefits</span> and outcomes. - Potential <span class="highlight-caution">side effects</span>, warnings, and any necessary precautions. Use simple, non-technical language that any patient can understand. Format the output using the following HTML <span> tags: - \`<span class="highlight-drugname">${drugName}</span>\` for every mention of the drug. - \`<span class="highlight-term">{medical_term}</span>\` for key medical concepts or mechanisms. - \`<span class="highlight-benefit">{positive_effect_or_benefit}</span>\` for benefits and improvements. - \`<span class="highlight-caution">{caution_side_effect_or_warning}</span>\` for any risks or side effects. Structure the response into 1–3 concise paragraphs without introductory or concluding fluff. If "${drugName}" is not a recognized drug, respond with a short notice asking for a valid name and suggest similar known drugs. If ${drugName} is not quite correct, change it yourself to the correct name.`; try { const response = await fetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: {'Content-Type':'application/json','Authorization':`Bearer ${appApiKey}`}, body: JSON.stringify({model: modelForAPI, messages: [{ role: 'user', content: userPrompt }], max_tokens: 350 }) }); const data = await response.json(); if (response.ok && data.choices?.[0]?.message?.content) { const adviceText = data.choices[0].message.content.trim(); displayAdviceResult(drugName, `${selectedModelDisplay} (API: ${modelForAPI})`, adviceText); } else { const errorMsg = data.error ? `${data.error.message} (Code: ${data.error.code})` : 'Unknown API error.'; updateAdviceGeneratorStatus(`Error generating advice: ${errorMsg}`, true, 7000); showEl(adviceGeneratorStatusMessage); if(data.error?.code==='invalid_api_key'||data.error?.type==='auth_error'){ updateApiKeyDisplayStatus('Invalid API Key.','error');appApiKey='';localStorage.removeItem(API_KEY_STORAGE_ITEM);apiKeyInput.value='';} } } catch (error) { console.error("Advice Generation Request failed:", error); updateAdviceGeneratorStatus('Request failed. Check network or console for details.', true, 7000); showEl(adviceGeneratorStatusMessage); } finally { hideEl(adviceGeneratorLoadingIndicator); generateAdviceActualBtn.disabled = false; if(returnToLandingViewBtn1) returnToLandingViewBtn1.disabled = false; } };
+    function updateAdviceGeneratorStatus(message, isError = false, duration = 5000) { if (!adviceGeneratorStatusMessage) return; adviceGeneratorStatusMessage.textContent = message; adviceGeneratorStatusMessage.style.color = isError ? 'var(--danger-color)' : 'var(--success-color)'; if (!isError && message && !message.toLowerCase().includes('error') && !message.toLowerCase().includes('valid')) { adviceGeneratorStatusMessage.style.color = 'var(--secondary-color)'; } if (message && duration > 0) { setTimeout(() => { if (adviceGeneratorStatusMessage.textContent === message) adviceGeneratorStatusMessage.textContent = ''; }, duration); } }
+    if(generateAdviceActualBtn) generateAdviceActualBtn.onclick = async () => { const drugName = adviceDrugNameInput.value.trim(); const selectedModelDisplay = adviceModelSelect.value; if (!appApiKey) { updateAdviceGeneratorStatus('API Key is missing. Configure it at the top.', true); apiKeyInput.focus(); return; } if (!drugName) { updateAdviceGeneratorStatus('Please enter a drug name.', true); adviceDrugNameInput.focus(); return; } updateAdviceGeneratorStatus(''); if(adviceGeneratorStatusMessage) hideEl(adviceGeneratorStatusMessage); if(adviceGeneratorLoadingIndicator) showEl(adviceGeneratorLoadingIndicator); generateAdviceActualBtn.disabled = true; if(returnToLandingViewBtn1) returnToLandingViewBtn1.disabled = true; let modelForAPI; switch (selectedModelDisplay) { case 'gpt-3.5-turbo': modelForAPI = 'gpt-3.5-turbo'; break; case 'gpt-4o-mini': modelForAPI = 'gpt-4o-mini'; break; case 'gpt-4o': modelForAPI = 'gpt-4o'; break; default: modelForAPI = 'gpt-4o-mini'; } const userPrompt = `Generate a patient-friendly explanation about <span class="result-highlight-drugname">${drugName}</span>. Your task is to clearly inform someone who has never taken this medication about: - What <span class="result-highlight-drugname">${drugName}</span> is and why it is prescribed. - How to correctly take it (including dosage, timing, or any instructions). - Important <span class="result-highlight-term">medical terms</span> and the mechanism of action, if relevant. - Expected <span class="result-highlight-benefit">benefits</span> and outcomes. - Potential <span class="result-highlight-caution">side effects</span>, warnings, and any necessary precautions. Use simple, non-technical language that any patient can understand. Format the output using the following HTML <span> tags: - \`<span class="result-highlight-drugname">${drugName}</span>\` for every mention of the drug. - \`<span class="result-highlight-term">{medical_term}</span>\` for key medical concepts or mechanisms. - \`<span class="result-highlight-benefit">{positive_effect_or_benefit}</span>\` for benefits and improvements. - \`<span class="result-highlight-caution">{caution_side_effect_or_warning}</span>\` for any risks or side effects. Structure the response into 1–3 concise paragraphs without introductory or concluding fluff. If "${drugName}" is not a recognized drug, respond with a short notice asking for a valid name and suggest similar known drugs. If ${drugName} is not quite correct, change it yourself to the correct name.`; try { const response = await fetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: {'Content-Type':'application/json','Authorization':`Bearer ${appApiKey}`}, body: JSON.stringify({model: modelForAPI, messages: [{ role: 'user', content: userPrompt }], max_tokens: 450 }) }); const data = await response.json(); if (response.ok && data.choices?.[0]?.message?.content) { const adviceText = data.choices[0].message.content.trim(); displayAdviceResult(drugName, `${selectedModelDisplay} (API: ${modelForAPI})`, adviceText); } else { const errorMsg = data.error ? `${data.error.message} (Code: ${data.error.code})` : 'Unknown API error.'; updateAdviceGeneratorStatus(`Error generating advice: ${errorMsg}`, true, 7000); if(adviceGeneratorStatusMessage) showEl(adviceGeneratorStatusMessage); if(data.error?.code==='invalid_api_key'||data.error?.type==='auth_error'){ updateApiKeyDisplayStatus('Invalid API Key.','error');appApiKey='';localStorage.removeItem(API_KEY_STORAGE_ITEM);apiKeyInput.value='';} } } catch (error) { console.error("Advice Generation Request failed:", error); updateAdviceGeneratorStatus('Request failed. Check network or console for details.', true, 7000); if(adviceGeneratorStatusMessage) showEl(adviceGeneratorStatusMessage); } finally { if(adviceGeneratorLoadingIndicator) hideEl(adviceGeneratorLoadingIndicator); generateAdviceActualBtn.disabled = false; if(returnToLandingViewBtn1) returnToLandingViewBtn1.disabled = false; } };
     if(returnToLandingViewBtn1) returnToLandingViewBtn1.onclick = () => switchToView('landingView');
 
     // --- ADVICE RESULT VIEW Logic ---
-    const resultDrugName = sel('resultDrugName');
-    const resultModelUsed = sel('resultModelUsed');
-    const adviceDisplayArea = sel('adviceDisplayArea');
-    const generateNewAdviceBtn = sel('generateNewAdviceBtn');
+    const resultAdviceDrugName = sel('resultAdviceDrugName'); const resultAdviceModelUsed = sel('resultAdviceModelUsed'); 
+    const adviceDisplayArea = sel('adviceDisplayArea'); const generateNewAdviceBtn = sel('generateNewAdviceBtn');
     const returnToLandingViewBtn2 = sel('returnToLandingViewBtn2');
-
-    function displayAdviceResult(drug, model, adviceHTML) { /* ... same as before ... */ if(resultDrugName) resultDrugName.textContent = drug; if(resultModelUsed) resultModelUsed.textContent = model; if(adviceDisplayArea) adviceDisplayArea.innerHTML = adviceHTML; switchToView('adviceResultView'); }
+    function displayAdviceResult(drug, model, adviceHTML) { if(resultAdviceDrugName) resultAdviceDrugName.textContent = drug; if(resultAdviceModelUsed) resultAdviceModelUsed.textContent = model; if(adviceDisplayArea) adviceDisplayArea.innerHTML = adviceHTML; switchToView('adviceResultView');}
     if(generateNewAdviceBtn) generateNewAdviceBtn.onclick = () => switchToView('adviceGeneratorView');
     if(returnToLandingViewBtn2) returnToLandingViewBtn2.onclick = () => switchToView('landingView');
+
+    // --- DOSAGE CALCULATOR VIEW Logic ---
+    const dosageDrugNameInput = sel('dosageDrugNameInput'); const dosagePatientWeightInput = sel('dosagePatientWeightInput');
+    const dosagePatientAgeInput = sel('dosagePatientAgeInput'); const dosageRenalFunctionInput = sel('dosageRenalFunctionInput');
+    const dosageModelSelect = sel('dosageModelSelect'); const calculateDosageActualBtn = sel('calculateDosageActualBtn');
+    const returnToLandingViewBtn3 = sel('returnToLandingViewBtn3'); 
+    const dosageCalculatorStatusMessage = sel('dosageCalculatorStatusMessage'); const dosageCalculatorLoadingIndicator = sel('dosageCalculatorLoadingIndicator');
+    if(dosageModelSelect) dosageModelSelect.value = 'gpt-4o'; 
+    function updateDosageCalculatorStatus(message, isError = false, duration = 7000) { if (!dosageCalculatorStatusMessage) return; dosageCalculatorStatusMessage.textContent = message; dosageCalculatorStatusMessage.style.color = isError ? 'var(--danger-color)' : 'var(--success-color)'; if (!isError && message && !message.toLowerCase().includes('error')) { dosageCalculatorStatusMessage.style.color = 'var(--secondary-color)'; } if (message && duration > 0) { setTimeout(() => { if (dosageCalculatorStatusMessage.textContent === message) dosageCalculatorStatusMessage.textContent = ''; }, duration); } }
+    if(calculateDosageActualBtn) calculateDosageActualBtn.onclick = async () => {
+        const drugName = dosageDrugNameInput.value.trim(); const weight = dosagePatientWeightInput.value.trim();
+        const age = dosagePatientAgeInput.value.trim(); const renal = dosageRenalFunctionInput.value.trim();
+        const selectedModel = dosageModelSelect.value;
+        if (!appApiKey) { updateDosageCalculatorStatus('API Key is missing. Configure it at the top.', true); if(apiKeyInput) apiKeyInput.focus(); return; }
+        if (!drugName) { updateDosageCalculatorStatus('Drug Name is required.', true); if(dosageDrugNameInput) dosageDrugNameInput.focus(); return; }
+        if (!weight) { updateDosageCalculatorStatus('Patient Weight is required.', true); if(dosagePatientWeightInput) dosagePatientWeightInput.focus(); return; }
+        if (!age) { updateDosageCalculatorStatus('Patient Age is required.', true); if(dosagePatientAgeInput) dosagePatientAgeInput.focus(); return; }
+        updateDosageCalculatorStatus(''); if(dosageCalculatorStatusMessage) hideEl(dosageCalculatorStatusMessage); if(dosageCalculatorLoadingIndicator) showEl(dosageCalculatorLoadingIndicator); calculateDosageActualBtn.disabled = true; if(returnToLandingViewBtn3) returnToLandingViewBtn3.disabled = true;
+        const prompt = `You are an AI assistant providing GENERAL INFORMATION based on common drug dosage guidelines for EXPERIMENTAL AND EDUCATIONAL PURPOSES for HOSPITAL PHARMACISTS. This information is NOT for direct patient use or clinical decision-making without professional verification. Drug Name: ${drugName}. Patient Weight: ${weight} kg. Patient Age: ${age} years. Renal Function (User Provided): "${renal}". Based on generally accepted dosage guidelines for the drug '${drugName}', provide TYPICAL dosage information for a patient with these characteristics. Your response should be geared towards a pharmacist audience. Your response should aim to include: 1. The typical dosage calculation or range (e.g., "X mg/kg/day divided Y times" or "Z mg every X hours"). Clearly show how the weight and age might be used if applicable. 2. Any common frequency or administration routes. 3. Mention any standard adjustments or special considerations based on age (e.g. pediatric, geriatric), weight, or the provided renal function description. If renal description is vague (e.g. "bad kidneys"), state that specific advice needs proper clinical assessment of renal function (e.g. CrCl/eGFR). 4. State any common maximum daily doses if widely known for this drug and context. 5. A brief concluding note: "<span class="result-highlight-disclaimer-ai">Reminder: This AI-generated information is for experimental/educational review by pharmacists and requires verification against official drug monographs and clinical judgment.</span>" 6. If the drug name is not recognized or if the provided parameters are clearly insufficient or outside a typical range for providing any general guideline, clearly state that and explain why. DO NOT INVENT INFORMATION OR DOSAGES. Format the response using these HTML <span> tags for emphasis: - Drug name: <span class="result-highlight-drugname">${drugName}</span> - Calculated or typical dosage values/ranges: <span class="result-highlight-dosage">{dosage_value}</span> - Important considerations, warnings, or adjustments: <span class="result-highlight-important-consideration">{consideration_text}</span> - The concluding reminder note text itself: <span class="result-highlight-disclaimer-ai">{reminder_text_as_above}</span>`;
+        try { const response = await fetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: {'Content-Type':'application/json','Authorization':`Bearer ${appApiKey}`}, body: JSON.stringify({model: selectedModel, messages: [{ role: 'user', content: prompt }], max_tokens: 700 }) }); const data = await response.json(); if (response.ok && data.choices?.[0]?.message?.content) { const dosageInfoHTML = data.choices[0].message.content.trim(); displayDosageResult(drugName, weight, age, renal, `${selectedModel} (API: ${selectedModel})`, dosageInfoHTML); } else { const errorMsg = data.error ? `${data.error.message} (Code: ${data.error.code})` : 'Unknown API error.'; updateDosageCalculatorStatus(`Error generating dosage info: ${errorMsg}`, true); if(dosageCalculatorStatusMessage) showEl(dosageCalculatorStatusMessage); if(data.error?.code==='invalid_api_key'||data.error?.type==='auth_error'){ updateApiKeyDisplayStatus('Invalid API Key.','error');appApiKey='';localStorage.removeItem(API_KEY_STORAGE_ITEM);apiKeyInput.value='';} } } catch (error) { console.error("Dosage Calculation Request failed:", error); updateDosageCalculatorStatus('Request failed. Check network or console for details.', true); if(dosageCalculatorStatusMessage) showEl(dosageCalculatorStatusMessage); } finally { if(dosageCalculatorLoadingIndicator) hideEl(dosageCalculatorLoadingIndicator); calculateDosageActualBtn.disabled = false; if(returnToLandingViewBtn3) returnToLandingViewBtn3.disabled = false; } };
+    if(returnToLandingViewBtn3) returnToLandingViewBtn3.onclick = () => switchToView('landingView');
+
+    // --- DOSAGE RESULT VIEW Logic ---
+    const resultDosageDrugName = sel('resultDosageDrugName'); const resultDosageWeight = sel('resultDosageWeight');
+    const resultDosageAge = sel('resultDosageAge'); const resultDosageRenal = sel('resultDosageRenal');
+    const resultDosageModelUsed = sel('resultDosageModelUsed'); const dosageDisplayArea = sel('dosageDisplayArea');
+    const calculateNewDosageBtn = sel('calculateNewDosageBtn'); const returnToLandingViewBtn4 = sel('returnToLandingViewBtn4');
+    function displayDosageResult(drug, weight, age, renal, model, dosageHTML) { if(resultDosageDrugName) resultDosageDrugName.textContent = drug; if(resultDosageWeight) resultDosageWeight.textContent = weight; if(resultDosageAge) resultDosageAge.textContent = age; if(resultDosageRenal) resultDosageRenal.textContent = renal || "Not specified"; if(resultDosageModelUsed) resultDosageModelUsed.textContent = model; if(dosageDisplayArea) dosageDisplayArea.innerHTML = dosageHTML; switchToView('dosageResultView');}
+    if(calculateNewDosageBtn) calculateNewDosageBtn.onclick = () => switchToView('dosageCalculatorView');
+    if(returnToLandingViewBtn4) returnToLandingViewBtn4.onclick = () => switchToView('landingView');
+
+    // --- DRUG QUIZZER VIEW Logic ---
+    const newQuizQuestionBtn = sel('newQuizQuestionBtn');
+    const showQuizAnswerBtn = sel('showQuizAnswerBtn');
+    const quizQuestionArea = sel('quizQuestionArea');
+    const quizAnswerArea = sel('quizAnswerArea');
+    const quizAnswerTitle = sel('quizAnswerTitle');
+    const quizzerLoadingIndicator = sel('quizzerLoadingIndicator');
+    const quizzerStatusMessage = sel('quizzerStatusMessage');
+    const returnToLandingViewBtn5 = sel('returnToLandingViewBtn5');
+
+    function updateQuizzerStatus(message, isError = false, duration = 4000) { if (!quizzerStatusMessage) return; quizzerStatusMessage.textContent = message; quizzerStatusMessage.style.color = isError ? 'var(--danger-color)' : 'var(--success-color)'; if (!isError && message && !message.toLowerCase().includes('error')) { quizzerStatusMessage.style.color = 'var(--secondary-color)'; } if (message && duration > 0) { setTimeout(() => { if (quizzerStatusMessage.textContent === message) quizzerStatusMessage.textContent = ''; }, duration); } }
+    async function fetchNewQuizQuestion() {
+        if (!appApiKey) {
+            updateQuizzerStatus('API Key is missing. Configure it at the top.', true);
+            if(apiKeyInput) apiKeyInput.focus();
+            return;
+        }
+
+        updateQuizzerStatus('');
+        if(quizzerLoadingIndicator) showEl(quizzerLoadingIndicator);
+        if(newQuizQuestionBtn) newQuizQuestionBtn.disabled = true;
+        if(showQuizAnswerBtn) showQuizAnswerBtn.disabled = true;
+        if(quizQuestionArea) quizQuestionArea.textContent = 'Fetching question...';
+        if(quizAnswerArea) { hideEl(quizAnswerArea); quizAnswerArea.textContent = ''; }
+        if(quizAnswerTitle) hideEl(quizAnswerTitle);
+        currentQuizAnswer = '';
+
+        // Add a changing element to the prompt
+        const requestNonce = Date.now(); // Using timestamp for variability
+
+        const prompt = `
+        You are a helpful assistant for creating pharmacy quiz questions.
+        Nonce: ${requestNonce} {/* This part changes each time, encouraging a new response */}
+        Generate a single, concise, pharmacy-related quiz question and its corresponding answer.
+        The question should be suitable for a pharmacist or pharmacy student living in The Netherlands. Avoid repeating questions.
+        Topics can include pharmacology, calculations, clinical scenarios, law, or drug information.
+        Provide the output STRICTLY in JSON format with two keys: "question" and "answer".
+        Example:
+        {
+          "question": "What is the primary mechanism of action for metformin?",
+          "answer": "Metformin primarily works by decreasing hepatic glucose production, decreasing intestinal absorption of glucose, and improving insulin sensitivity by increasing peripheral glucose uptake and utilization."
+        }
+        Another example:
+        {
+          "question": "A patient is prescribed Drug X 5mg BID. How many tablets will they need for a 30-day supply if Drug X is available as 5mg tablets?",
+          "answer": "60 tablets (5mg twice a day = 2 tablets/day. 2 tablets/day * 30 days = 60 tablets)."
+        }`;
+
+        try {
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${appApiKey}` },
+                body: JSON.stringify({
+                    model: "gpt-4o-mini", 
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: 1.0, // Increased temperature for more variability
+                    max_tokens: 250,
+                    response_format: { type: "json_object" } 
+                })
+            });
+            // ... (rest of the function: parsing JSON, error handling, UI updates) ...
+            const data = await response.json();
+            if (response.ok && data.choices?.[0]?.message?.content) {
+                try { 
+                    const qaPair = JSON.parse(data.choices[0].message.content); 
+                    if (qaPair.question && qaPair.answer) { 
+                        if(quizQuestionArea) quizQuestionArea.textContent = qaPair.question; 
+                        currentQuizAnswer = qaPair.answer; 
+                        if(showQuizAnswerBtn) {showQuizAnswerBtn.disabled = false; showQuizAnswerBtn.textContent = "Show Answer";} 
+                    } else { 
+                        throw new Error("AI response did not contain 'question' or 'answer'."); 
+                    }
+                } catch (parseError) { 
+                    console.error("Error parsing AI JSON response:", parseError, "Raw content:", data.choices[0].message.content); 
+                    updateQuizzerStatus('Error processing AI response format. Retrying...', true, 5000); 
+                    if(quizQuestionArea) quizQuestionArea.textContent = 'Could not load question. Try "New Question".'; 
+                }
+            } else { 
+                const errorMsg = data.error ? `${data.error.message} (Code: ${data.error.code})` : 'Unknown API error.'; 
+                updateQuizzerStatus(`Error: ${errorMsg}`, true); 
+                if(quizQuestionArea) quizQuestionArea.textContent = 'Failed to fetch question.'; 
+                if(data.error?.code==='invalid_api_key'||data.error?.type==='auth_error'){ updateApiKeyDisplayStatus('Invalid API Key.','error');appApiKey='';localStorage.removeItem(API_KEY_STORAGE_ITEM);apiKeyInput.value='';} 
+            }
+        } catch (error) { 
+            console.error("Fetch Quiz Question failed:", error); 
+            updateQuizzerStatus('Request failed. Check network.', true); 
+            if(quizQuestionArea) quizQuestionArea.textContent = 'Network error.';
+        } finally { 
+            if(quizzerLoadingIndicator) hideEl(quizzerLoadingIndicator); 
+            if(newQuizQuestionBtn) newQuizQuestionBtn.disabled = false; 
+        }
+    }
+    if(newQuizQuestionBtn) newQuizQuestionBtn.onclick = fetchNewQuizQuestion;
+    if(showQuizAnswerBtn) showQuizAnswerBtn.onclick = () => { if (currentQuizAnswer) { if(quizAnswerArea) quizAnswerArea.textContent = currentQuizAnswer; if(quizAnswerArea) showEl(quizAnswerArea); if(quizAnswerTitle) showEl(quizAnswerTitle); showQuizAnswerBtn.disabled = true; showQuizAnswerBtn.textContent = "Answer Shown"; } else { if(quizAnswerArea) quizAnswerArea.textContent = "No answer available for the current question."; if(quizAnswerArea) showEl(quizAnswerArea); if(quizAnswerTitle) showEl(quizAnswerTitle); }};
+    if(returnToLandingViewBtn5) returnToLandingViewBtn5.onclick = () => switchToView('landingView');
 
     // --- Initial Application Setup ---
     document.addEventListener('DOMContentLoaded', () => {
         loadApiKeyFromStorage();
-        loadHistory(); // For Interaction Finder
-        loadCustomPrompt(); // For Interaction Finder
-        // switchToMainAppSection('captureSection'); // Not needed here, handled by switchToView if mainAppView is targeted
-        switchToView('landingView'); // Start with the new landing page
+        if (typeof loadHistoryIF === 'function') loadHistoryIF(); 
+        if (typeof loadCustomPromptIF === 'function') loadCustomPromptIF();
+        switchToView('landingView');
     });
 </script>
 </body>
