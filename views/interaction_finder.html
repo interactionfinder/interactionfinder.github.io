@@ -1,0 +1,43 @@
+<div id="interactionFinderViewLocal">
+    <header class="view-header" style="margin-bottom: 0;"><h2>Prescription Interaction Finder</h2></header>
+    <div class="page-container"> 
+        <section id="captureSectionIF" class="view-section"> <!-- Ensure IF suffix for unique IDs -->
+          <h2>Take a Photo</h2>
+          <p style="margin-bottom: 1.2rem; color: #555; font-size: 0.9rem; text-align: center;">
+            Upload an image of the prescription to analyze.
+          </p>
+          <div style="text-align:center;"> <button id="takePhotoBtnIF">Take Photo or Upload</button> </div>
+          <input id="fileInputIF" type="file" accept="image/*" capture="environment" hidden>
+        </section>
+        <section id="historySectionIF" class="view-section" hidden>
+            <div class="history-header"><h2>Recent Analyses</h2><button id="clearAllHistoryBtnIF" class="danger">Clear All</button></div>
+            <div id="historyCarouselContainerIF"> <div id="historyCarouselIF"></div> </div>
+            <p id="noHistoryMessageIF" hidden>No recent analyses found.</p>
+        </section>
+        <div id="promptCustomizationBtnContainerIF" hidden> <button id="goToPromptCustomizationBtnIF" class="secondary">Prompt Customization</button> </div>
+        <section id="previewSectionIF" class="view-section" hidden>
+          <h2>Confirm Prescription Image</h2> <img id="previewImgIF" alt="preview">
+          <div class="button-group">
+            <p style="margin-bottom: 0.5rem; text-align: center; font-size:0.9rem;">Select AI Model:</p>
+            <select id="modelSelectIF"><option value="gpt-4o-mini">GPT-4o-mini (Faster, Good)</option><option value="gpt-4o">GPT-4o (Slower, Best)</option></select>
+            <button id="usePhotoBtnIF">Use This Photo & Analyze</button> <button id="retakeBtnIF" class="secondary">Retake or Choose Different</button>
+          </div>
+        </section>
+        <section id="loadingSectionIF" class="view-section" hidden> <div class="spinner"></div> <p>Analyzing image, please wait…</p> </section>
+        <section id="resultSectionIF" class="view-section" hidden>
+          <h2>Analysis Results</h2> <div id="responseBoxIF" role="document" aria-live="polite"></div>
+          <div class="result-actions"><button id="copyResultsBtnIF">Copy Results</button><button id="restartBtnIF" class="secondary">Back to Start</button></div>
+        </section>
+        <section id="promptSectionIF" class="view-section" hidden>
+            <h2>Customize System Prompt</h2>
+            <p style="font-size:0.85rem; color: var(--secondary-color); margin-bottom:1rem;">Modify the instructions given to the AI. Be careful, as significant changes can affect results.</p>
+            <textarea id="promptEditorIF" rows="10"></textarea>
+            <div class="prompt-actions"><button id="savePromptBtnIF">Save Prompt</button><button id="resetPromptBtnIF" class="secondary">Reset to Default</button><button id="returnToMainFromPromptBtnIF" class="secondary">Return to Main</button></div>
+            <p id="promptStatusIF"></p>
+        </section>
+    </div>
+    <div class="main-app-external-buttons-container">
+        <button id="patientInfoGeneratorBtnExternalIF" class="purple">Patient Info Gen. (Ext)</button>
+        <button id="backToLandingViewFromMainBtnIF" class="secondary">Back to Main Menu</button>
+    </div>
+</div>

@@ -1,0 +1,174 @@
+/* style.css */
+:root {
+  --primary-color: #007bff; --primary-hover-color: #0056b3; --secondary-color: #6c757d;
+  --secondary-hover-color: #545b62; --success-color: #28a745; --danger-color: #dc3545;
+  --warning-color: #ffc107; --warning-text-color: #856404; --warning-bg-color: #fff3cd;
+  --purple-color: #6f42c1; --purple-hover-color: #5a32a3; --info-color: #17a2b8; 
+  --highlight-drug-bg: #e6f7ff; --highlight-drug-text: #005f8d;
+  --highlight-importance-high-bg: #ffe6e6; --highlight-importance-high-text: #c00;
+  --highlight-importance-medium-bg: #fff0e6; --highlight-importance-medium-text: #c50;
+  --highlight-importance-low-bg: #e6ffe6; --highlight-importance-low-text: #070;
+  --light-bg: #f8f9fa; --card-bg: #ffffff; --text-color: #333; --border-color: #dee2e6;
+  --border-radius: 0.5rem; --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --font-family: 'Poppins', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-family); background-color: var(--light-bg); color: var(--text-color);
+  display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 1.5rem 1rem;
+}
+
+.app-container { width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem; }
+#appHeader { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem; width: 100%; max-width: 700px; }
+#appHeader img { width: 40px; height: 40px; border-radius: 50%; }
+#appHeader h1 { margin: 0; font-size: 1.6rem; color: var(--text-color); font-weight: 600;}
+
+#apiKeyConfigArea { background-color: var(--card-bg); padding: 1rem 1.25rem; border-radius: var(--border-radius); box-shadow: var(--box-shadow); width: 100%; max-width: 700px; }
+#apiKeyConfigArea h3 { margin-top: 0; margin-bottom: 0.75rem; font-size: 1.15rem; color: var(--text-color);}
+.api-key-form-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+#apiKeyConfigArea label { font-weight: 500; flex-shrink: 0; font-size: 0.9rem; color: var(--text-color);}
+#apiKeyConfigArea input[type="password"] { flex-grow: 1; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 0.9rem; min-width: 180px; font-family: var(--font-family); color: var(--text-color); }
+#apiKeyConfigArea input[type="password"]:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
+#apiKeyConfigArea .api-key-buttons button { padding: 0.5rem 0.9rem; font-size: 0.85rem; margin-right: 0.4rem; }
+#apiKeyConfigArea .api-key-buttons button:last-child { margin-right: 0; }
+#apiKeyConfigArea .api-key-buttons button.test-key { background-color: var(--success-color); }
+#apiKeyConfigArea .api-key-buttons button.test-key:hover { background-color: #1e7e34; }
+#apiKeyStatusGlobal { font-size: 0.85rem; min-height: 1.2em; margin-top: 0.4rem; font-weight: 500; } /* Target global ID */
+#apiKeyStatusGlobal.success { color: var(--success-color); } 
+#apiKeyStatusGlobal.error { color: var(--danger-color); } 
+#apiKeyStatusGlobal.info { color: var(--secondary-color); }
+
+button { padding: 0.7rem 1.4rem; font-size: 0.95rem; font-weight: 500; border: none; border-radius: var(--border-radius); cursor: pointer; background: var(--primary-color); color: #fff; transition: background-color 0.2s ease-in-out, transform 0.1s ease; font-family: var(--font-family); }
+button:hover { background: var(--primary-hover-color); transform: translateY(-1px); }
+button.secondary { background-color: var(--secondary-color); } button.secondary:hover { background-color: var(--secondary-hover-color); }
+button.danger { background-color: var(--danger-color); } button.danger:hover { background-color: #c82333; }
+button.purple { background-color: var(--purple-color); } button.purple:hover { background-color: var(--purple-hover-color); }
+button.green { background-color: var(--success-color); } button.green:hover { background-color: #1e7e34; }
+button.warning { background-color: var(--warning-color); color: #333; } button.warning:hover { background-color: #e0a800; }
+button.info { background-color: var(--info-color); color: #fff;} button.info:hover { background-color: #138496; }
+button.orange { background-color: #fd7e14; color:white; } button.orange:hover { background-color: #e66b00; }
+button:disabled { background-color: var(--secondary-color); opacity: 0.7; cursor: not-allowed; transform: translateY(0); }
+
+.view-section { background-color: var(--card-bg); padding: 1.25rem 1.5rem; border-radius: var(--border-radius); box-shadow: var(--box-shadow); width: 100%; }
+.view-header { text-align: center; margin-bottom: 1.5rem; width: 100%; background-color: var(--card-bg); padding: 1rem 1.25rem; border-radius: var(--border-radius); box-shadow: var(--box-shadow); }
+.view-header h2 { margin: 0; font-size: 1.4rem; color: var(--primary-color); font-weight: 600; }
+
+/* Landing View */
+#landingViewLocal .landing-actions { display: flex; flex-direction: column; gap: 1rem; align-items: center; }
+#landingViewLocal .landing-actions button { width: 100%; max-width: 350px; padding: 0.8rem 1.5rem; font-size: 1rem;}
+#landingViewLocal p { text-align: center; margin-bottom: 1.5rem; color: var(--text-color); font-size: 1.05rem;}
+
+/* Main App View (Interaction Finder) */
+#interactionFinderViewLocal .page-container { width: 100%; display: flex; flex-direction: column; gap: 1.5rem; }
+#interactionFinderViewLocal h2 { font-weight: 600; color: var(--text-color); margin-bottom: 0.75rem; font-size: 1.3rem; }
+#interactionFinderViewLocal #captureSection > h2, 
+#interactionFinderViewLocal #historySection > .history-header > h2, 
+#interactionFinderViewLocal #promptSection > h2 { text-align: center; }
+#interactionFinderViewLocal img#previewImg { max-width: 100%; height: auto; border-radius: var(--border-radius); box-shadow: 0 2px 6px rgba(0,0,0,.1); margin-top: 1rem; margin-bottom: 1.5rem; display: block; }
+.spinner { width: 40px; height: 40px; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 1.5rem auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#interactionFinderViewLocal #responseBox { width: 100%; min-height: 180px; max-height: 450px; overflow-y: auto; padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 0.95rem; background-color: #fdfdfd; line-height: 1.6; white-space: pre-wrap; }
+#interactionFinderViewLocal #responseBox h3 { font-size: 1.15em; margin-top: 1em; margin-bottom: 0.5em; color: var(--primary-color); display: flex; align-items: center; justify-content: space-between; }
+#interactionFinderViewLocal #responseBox h3 .section-title-text { flex-grow: 1; }
+#interactionFinderViewLocal .copy-section-btn { background: none; border: 1px solid var(--border-color); color: var(--secondary-color); padding: 0.2em 0.4em; font-size: 0.75em; border-radius: 0.25rem; cursor: pointer; margin-left: 0.5em; opacity: 0.7; transition: opacity 0.2s, background-color 0.2s; flex-shrink: 0; }
+#interactionFinderViewLocal .copy-section-btn:hover { opacity: 1; background-color: var(--light-bg); color: var(--primary-color); }
+#interactionFinderViewLocal #responseBox ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1em; padding-left: 0;}
+#interactionFinderViewLocal #responseBox li { margin-bottom: 0.3em; } 
+#interactionFinderViewLocal #responseBox strong { font-weight: 600; } 
+#interactionFinderViewLocal #responseBox p { margin-bottom: 0.8em; }
+#interactionFinderViewLocal .highlight-drug { background-color:var(--highlight-drug-bg); color:var(--highlight-drug-text); padding:0.1em 0.3em; border-radius:0.2em; font-weight:500; }
+#interactionFinderViewLocal .highlight-importance-high { background-color:var(--highlight-importance-high-bg); color:var(--highlight-importance-high-text); padding:0.1em 0.3em; border-radius:0.2em; font-weight:bold; }
+#interactionFinderViewLocal .highlight-importance-medium { background-color:var(--highlight-importance-medium-bg); color:var(--highlight-importance-medium-text); padding:0.1em 0.3em; border-radius:0.2em; font-weight:500; }
+#interactionFinderViewLocal .highlight-importance-low { background-color:var(--highlight-importance-low-bg); color:var(--highlight-importance-low-text); padding:0.1em 0.3em; border-radius:0.2em; font-weight:500; }
+#interactionFinderViewLocal #modelSelectIF, 
+#interactionFinderViewLocal textarea#promptEditorIF { width: 100%; padding: 0.6rem 0.9rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 0.95rem; background-color: #fff; color: var(--text-color); font-family: var(--font-family); }
+#interactionFinderViewLocal textarea#promptEditorIF { min-height: 250px; resize: vertical; margin-bottom: 1rem; }
+#interactionFinderViewLocal textarea#promptEditorIF:focus, 
+#interactionFinderViewLocal #modelSelectIF:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
+#interactionFinderViewLocal #loadingSection { text-align: center; } 
+#interactionFinderViewLocal #loadingSection p { margin-top: 0.5rem; font-size: 1rem; color: var(--secondary-color); }
+#interactionFinderViewLocal #previewSection .button-group { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.2rem; }
+#interactionFinderViewLocal #previewSection #modelSelectIF { margin-bottom: 0.6rem; }
+#interactionFinderViewLocal #resultSection { display: flex; flex-direction: column; }
+#interactionFinderViewLocal .result-actions { display: flex; justify-content: center; align-items: center; margin-top: 1.5rem; gap: 1rem; width: 100%; }
+#interactionFinderViewLocal .result-actions button { flex-grow: 0; min-width: 120px; }
+@media (max-width: 480px) { 
+    #interactionFinderViewLocal .result-actions { flex-direction: column; align-items: stretch; } 
+    #interactionFinderViewLocal .result-actions button { width: 100%; } 
+}
+#interactionFinderViewLocal .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+#interactionFinderViewLocal .history-header h2 { margin-bottom: 0; flex-grow: 1; text-align: center;}
+#interactionFinderViewLocal #clearAllHistoryBtnIF { font-size: 0.8rem; padding: 0.4rem 0.8rem; flex-shrink: 0; } /* Suffixed ID */
+#interactionFinderViewLocal #historyCarouselContainer { overflow-x: auto; white-space: nowrap; padding-bottom: 1rem; margin-bottom: -1rem; }
+#interactionFinderViewLocal #historyCarousel { display: flex; gap: 0.75rem; }
+#interactionFinderViewLocal .history-item-wrapper { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-color); width: 110px; position: relative; }
+#interactionFinderViewLocal .history-item { width: 100px; height: 100px; border: 2px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; cursor: pointer; transition: border-color 0.2s ease, transform 0.2s ease; margin-bottom: 0.25rem; position: relative; }
+#interactionFinderViewLocal .history-item:hover { border-color: var(--primary-color); transform: translateY(-2px); }
+#interactionFinderViewLocal .history-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#interactionFinderViewLocal .history-item-date { font-size: 0.75rem; color: var(--secondary-color); text-align: center; display: block; white-space: normal; line-height: 1.2; width: 100%; }
+#interactionFinderViewLocal .delete-history-item-btn { position: absolute; top: 3px; right: 3px; background-color: rgba(0,0,0,0.4); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; font-weight: bold; line-height: 20px; text-align: center; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.2s ease, background-color 0.2s ease; z-index: 10; }
+#interactionFinderViewLocal .history-item-wrapper:hover .delete-history-item-btn { opacity: 1; }
+#interactionFinderViewLocal .delete-history-item-btn:hover { background-color: var(--danger-color); }
+#interactionFinderViewLocal #noHistoryMessageIF { color: var(--secondary-color); font-style: italic; text-align: center; padding: 1rem 0;} /* Suffixed ID */
+#interactionFinderViewLocal #promptCustomizationBtnContainer { text-align: center; margin-top: 0; }
+#interactionFinderViewLocal #promptSection .prompt-actions { display: flex; justify-content: space-around; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+#interactionFinderViewLocal #promptSection .prompt-actions button { flex-grow: 1; min-width: 150px; }
+#interactionFinderViewLocal #promptStatusIF { font-size: 0.9rem; min-height: 1.3em; margin-top: 1rem; font-weight: 500; text-align: center; } 
+#interactionFinderViewLocal #promptStatusIF.success { color: var(--success-color); } 
+#interactionFinderViewLocal #promptStatusIF.info { color: var(--secondary-color); }
+#interactionFinderViewLocal .main-app-external-buttons-container { width: 100%; display: flex; justify-content: center; padding-top: 0; gap: 1rem; margin-top:1.5rem; /* Ensure space from content above */ }
+
+
+/* Shared Modal Styling (using the 'Shared' suffixed IDs from index.html) */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s linear; }
+.modal-overlay.active { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s 0s linear; }
+.modal-content { background-color: var(--card-bg); padding: 1.5rem 2rem; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 90%; max-width: 450px; text-align: center; transform: scale(0.95); transition: transform 0.3s ease; }
+.modal-overlay.active .modal-content { transform: scale(1); }
+.modal-content p#modalMessageShared { margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.5; }
+.modal-buttons { display: flex; justify-content: center; gap: 1rem; }
+.modal-buttons button { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+
+
+/* Advice Generator, Dosage Calculator, Quizzer Common Form Styles */
+.tool-form-group { margin-bottom: 1rem; }
+.tool-form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.95rem; color: var(--text-color); }
+.tool-form-group input[type="text"], .tool-form-group input[type="number"], .tool-form-group select, .tool-form-group textarea { width: 100%; padding: 0.6rem 0.9rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 0.95rem; background-color: #fff; color: var(--text-color); font-family: var(--font-family); }
+.tool-form-group input[type="text"]:focus, .tool-form-group input[type="number"]:focus, .tool-form-group select:focus, .tool-form-group textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
+.tool-status-message { text-align:center; min-height:1.2em; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem;}
+.tool-action-buttons { display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center; flex-wrap: wrap;}
+.tool-action-buttons button { min-width: 150px; }
+.tool-loading-indicator { text-align: center; }
+.tool-loading-indicator .spinner { margin-bottom: 0.5rem; } /* Adjusted spinner margin */
+.tool-loading-indicator p { margin-top: 0; color: var(--secondary-color); font-size: 0.9rem;}
+        
+/* Result Common Styles (Advice, Dosage, Quizzer) */
+.result-display-area { padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); background-color: #fdfdfd; line-height: 1.7; min-height: 80px; font-size: 0.95rem; margin-bottom: 1rem; }
+.result-display-area p { margin-bottom: 0.8em; } .result-display-area p:last-child { margin-bottom: 0; }
+.result-highlight-drugname { background-color: var(--highlight-drug-bg); color: var(--highlight-drug-text); padding: 0.1em 0.3em; border-radius: 0.25rem; font-weight: 600;}
+.result-highlight-term { background-color: #fffbe6; color: #856404; padding: 0.1em 0.3em; border-radius: 0.25rem; font-style: italic;}
+.result-highlight-benefit { background-color: #e6ffe6; color: #155724; padding: 0.1em 0.3em; border-radius: 0.25rem; font-weight: 500;}
+.result-highlight-caution { background-color: #ffe6e6; color: #721c24; padding: 0.1em 0.3em; border-radius: 0.25rem; font-weight: bold;}
+.result-highlight-dosage { background-color: var(--warning-bg-color); color: var(--warning-text-color); padding: 0.1em 0.3em; border-radius: 0.25rem; font-weight: bold;}
+.result-highlight-important-consideration { background-color: #fff3cd; color: var(--warning-text-color); padding: 0.1em 0.3em; border-radius: 0.25rem; font-style: italic;}
+.result-highlight-disclaimer-ai { color: var(--danger-color); font-weight: bold; border: 1px dashed var(--danger-color); padding: 0.2em 0.4em; display: inline-block; margin-top:0.5em; margin-bottom: 0.5em; background-color: #fee; font-size:0.9em; }
+.result-info-bar { margin-bottom: 1rem; font-size: 0.9rem; color: var(--secondary-color); line-height: 1.5; }
+.result-info-bar strong { color: var(--text-color); font-weight: 600; }
+.dosage-experimental-note, .anticoag-experimental-note { font-size: 0.85rem; color: var(--secondary-color); text-align: left; padding: 0.75rem 1rem; margin-bottom: 1rem; border: 1px dashed var(--border-color); border-radius: var(--border-radius); background-color: #f9f9f9; }
+.anticoag-experimental-note strong, .dosage-experimental-note strong { color: var(--text-color); display: block; margin-bottom: 0.3em; text-align: center;}
+
+/* Drug Quizzer Specific Styles */
+#quizQuestionArea, #quizAnswerArea { background-color: #f9f9f9; border: 1px solid var(--border-color); padding: 1rem; border-radius: var(--border-radius); min-height: 60px; margin-bottom: 1rem; font-size: 1rem; line-height: 1.6; }
+#quizAnswerArea { background-color: #e9f7ef; border-color: var(--success-color); }
+#quizAnswerArea[hidden] { display: none; } 
+#quizzerStatusMessage { text-align: center; margin-bottom: 1rem; min-height: 1.2em; font-weight: 500;}
+
+/* Anticoagulation Bridging View specific styles */
+#anticoagBridgingViewLocal .tool-form-group textarea { min-height: 80px; resize: vertical; } /* Target local view ID */
+#anticoagResultViewLocal #anticoagResultDisplayArea h3 { font-size: 1.1em; color: var(--primary-color); margin-top: 1rem; margin-bottom: 0.5rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border-color); }
+#anticoagResultViewLocal #anticoagResultDisplayArea ul { list-style-type: disc; margin-left: 1.5em; padding-left: 0.5em; }
+#anticoagResultViewLocal #anticoagResultDisplayArea li { margin-bottom: 0.5em; }
+#anticoagResultViewLocal .highlight-action { font-weight: 600; color: var(--info-color); }
+#anticoagResultViewLocal .highlight-timing { font-style: italic; color: var(--secondary-hover-color); }
+#anticoagResultViewLocal .highlight-risk-factor { background-color: var(--warning-bg-color); padding: 0.1em 0.2em; border-radius: 0.2em;}
+
+[hidden] { display: none !important; }

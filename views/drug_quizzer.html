@@ -1,0 +1,27 @@
+<div id="drugQuizzerViewLocal">
+    <header class="view-header"><h2>Pharmacy Drug Quizzer</h2></header>
+    <section class="view-section">
+        <div class="tool-action-buttons" style="margin-bottom: 1.5rem;">
+            <button id="newQuizQuestionBtn">New Question</button>
+        </div>
+        <div id="quizzerLoadingIndicator" class="tool-loading-indicator" hidden>
+            <div class="spinner" style="width:30px; height:30px; border-width:4px;"></div>
+            <p>Fetching new question...</p>
+        </div>
+        <p id="quizzerStatusMessage" class="tool-status-message"></p>
+
+        <h3>Question:</h3>
+        <div id="quizQuestionArea" class="result-display-area" style="background-color: var(--light-bg);">Click "New Question" to start.</div>
+        
+        <div class="tool-action-buttons" style="margin-top: 1rem;">
+            <button id="showQuizAnswerBtn" disabled>Show Answer</button>
+        </div>
+
+        <h3 id="quizAnswerTitle" hidden style="margin-top: 1.5rem;">Answer:</h3>
+        <div id="quizAnswerArea" class="result-display-area" style="background-color: #e9f7ef; border-color: var(--success-color);" hidden></div>
+
+        <div class="tool-action-buttons" style="margin-top: 2rem;">
+            <button id="returnToLandingViewBtn5" class="secondary">Back to Main Menu</button>
+        </div>
+    </section>
+</div>

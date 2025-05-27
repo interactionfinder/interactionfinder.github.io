@@ -1,0 +1,26 @@
+<div id="adviceGeneratorViewLocal">
+    <header class="view-header"><h2>Generate Medication Advice</h2></header>
+    <section class="view-section">
+        <div class="tool-form-group">
+            <label for="adviceDrugNameInput">Drug Name:</label>
+            <input type="text" id="adviceDrugNameInput" placeholder="e.g., Amoxicillin" class="tool-input">
+        </div>
+        <div class="tool-form-group">
+            <label for="adviceModelSelect">Select AI Model:</label>
+            <select id="adviceModelSelect" class="tool-select">
+                <option value="gpt-4o-mini">GPT-4o-mini</option>
+                <option value="gpt-3.5-turbo">GPT-3.5-Turbo</option>
+                <option value="gpt-4o">GPT-4o</option>
+            </select>
+        </div>
+        <p id="adviceGeneratorStatusMessage" class="tool-status-message"></p>
+        <div id="adviceGeneratorLoadingIndicator" class="tool-loading-indicator" hidden>
+            <div class="spinner" style="width:30px; height:30px; border-width:4px;"></div>
+            <p>Generating advice...</p>
+        </div>
+        <div class="tool-action-buttons">
+            <button id="generateAdviceActualBtn">Generate Advice</button>
+            <button id="returnToLandingViewBtn1" class="secondary">Back to Main Menu</button>
+        </div>
+    </section>
+</div>

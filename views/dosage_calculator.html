@@ -1,0 +1,41 @@
+<div id="dosageCalculatorViewLocal">
+    <header class="view-header"><h2>Dosage Calculator (Experimental Tool)</h2></header>
+    <section class="view-section">
+        <p class="dosage-experimental-note">
+            <strong>Note for Pharmacists:</strong> This tool provides AI-generated dosage information based on general guidelines for experimental and educational purposes. Always verify with official drug monographs and apply professional clinical judgment.
+        </p>
+        <div class="tool-form-group">
+            <label for="dosageDrugNameInput">Drug Name:</label>
+            <input type="text" id="dosageDrugNameInput" placeholder="e.g., Amoxicillin">
+        </div>
+        <div class="tool-form-group">
+            <label for="dosagePatientWeightInput">Patient Weight (kg):</label>
+            <input type="number" id="dosagePatientWeightInput" placeholder="e.g., 70" min="0" step="any">
+        </div>
+        <div class="tool-form-group">
+            <label for="dosagePatientAgeInput">Patient Age (years):</label>
+            <input type="number" id="dosagePatientAgeInput" placeholder="e.g., 35" min="0" step="any">
+        </div>
+        <div class="tool-form-group">
+            <label for="dosageRenalFunctionInput">Renal Function (e.g., Normal, CrCl value, Description):</label>
+            <input type="text" id="dosageRenalFunctionInput" placeholder="e.g., Normal, CrCl 45 mL/min">
+        </div>
+         <div class="tool-form-group">
+            <label for="dosageModelSelect">Select AI Model:</label>
+            <select id="dosageModelSelect">
+                <option value="gpt-4o">GPT-4o (Most Capable)</option>
+                <option value="gpt-4o-mini">GPT-4o-mini (Balanced)</option>
+                <option value="gpt-3.5-turbo">GPT-3.5-Turbo</option>
+            </select>
+        </div>
+        <p id="dosageCalculatorStatusMessage" class="tool-status-message"></p>
+        <div id="dosageCalculatorLoadingIndicator" class="tool-loading-indicator" hidden>
+            <div class="spinner" style="width:30px; height:30px; border-width:4px;"></div>
+            <p>Calculating dosage information...</p>
+        </div>
+        <div class="tool-action-buttons">
+            <button id="calculateDosageActualBtn">Get Dosage Info</button>
+            <button id="returnToLandingViewBtn3" class="secondary">Back to Main Menu</button>
+        </div>
+    </section>
+</div>

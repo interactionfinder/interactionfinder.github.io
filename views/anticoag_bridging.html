@@ -1,0 +1,49 @@
+<div id="anticoagBridgingViewLocal">
+    <header class="view-header"><h2>Anticoagulation Bridging Explainer (Experimental)</h2></header>
+    <section class="view-section">
+        <div class="anticoag-experimental-note">
+            <strong>Pharmacist Experimental Tool:</strong> This tool generates general anticoagulation bridging information based on common guidelines.
+            It is intended for educational review and to explore AI capabilities.
+            <strong>It DOES NOT replace individualized patient assessment, current clinical guidelines (e.g., ACCP/CHEST), or institutional protocols.</strong>
+            Always verify information and apply professional judgment.
+        </div>
+        <div class="tool-form-group">
+            <label for="anticoagCurrentMedInput">Current Anticoagulant:</label>
+            <select id="anticoagCurrentMedInput">
+                <option value="Warfarin">Warfarin</option>
+                <option value="Apixaban">Apixaban (Eliquis)</option>
+                <option value="Rivaroxaban">Rivaroxaban (Xarelto)</option>
+                <option value="Dabigatran">Dabigatran (Pradaxa)</option>
+                <option value="Edoxaban">Edoxaban (Savaysa/Lixiana)</option>
+                <option value="LMWH_treatment">LMWH (Enoxaparin, Dalteparin - Treatment Dose)</option>
+                <option value="LMWH_prophylaxis">LMWH (Enoxaparin, Dalteparin - Prophylactic Dose)</option>
+                <option value="DOAC_other">Other DOAC (Specify in notes)</option>
+                <option value="Other">Other (Specify in notes)</option>
+            </select>
+        </div>
+        <div class="tool-form-group">
+            <label for="anticoagProcedureInput">Planned Procedure & Estimated Bleed Risk:</label>
+            <input type="text" id="anticoagProcedureInput" placeholder="e.g., Dental extraction (low risk), Colonoscopy with biopsy (mod risk), Major abdominal surgery (high risk)">
+        </div>
+        <div class="tool-form-group">
+            <label for="anticoagThromboRiskInput">Patient-Specific Thromboembolism Risk Factors:</label>
+            <textarea id="anticoagThromboRiskInput" placeholder="e.g., Mechanical mitral valve, AFib with CHADS-VASc 6, VTE within last 3 months, No major risk factors"></textarea>
+        </div>
+         <div class="tool-form-group">
+            <label for="anticoagModelSelect">Select AI Model:</label>
+            <select id="anticoagModelSelect">
+                <option value="gpt-4o">GPT-4o (Most Capable)</option>
+                <option value="gpt-4o-mini">GPT-4o-mini (Balanced)</option>
+            </select>
+        </div>
+        <p id="anticoagBridgingStatusMessage" class="tool-status-message"></p>
+        <div id="anticoagBridgingLoadingIndicator" class="tool-loading-indicator" hidden>
+            <div class="spinner" style="width:30px; height:30px; border-width:4px;"></div>
+            <p>Generating bridging information...</p>
+        </div>
+        <div class="tool-action-buttons">
+            <button id="getBridgingInfoBtn">Get Bridging Info</button>
+            <button id="returnToLandingViewBtn6" class="secondary">Back to Main Menu</button>
+        </div>
+    </section>
+</div>
